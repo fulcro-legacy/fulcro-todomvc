@@ -13,4 +13,5 @@
                                        :output-to     "resources/public/js/compiled/untangled-todomvc.js"
                                        :output-dir    "resources/public/js/compiled/dev"
                                        :optimizations :none}}]}
-  :figwheel {:css-dirs ["resources/public/css"]})
+  :figwheel {:css-dirs ["resources/public/css"]
+             :server-port 2345})

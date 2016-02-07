@@ -1,0 +1,5 @@
+.idea/
+target/
+figwheel_server.log
+*.iml
+resources/public/js
