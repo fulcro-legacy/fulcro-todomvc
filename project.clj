@@ -3,8 +3,8 @@
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha30"]
                  [untangled-client "0.4.2-SNAPSHOT"]]
-  :plugins [[lein-figwheel "0.5.0-1"]]
-  :clean-targets ^{:protect false} ["resources/public/js" "target"]
+  :plugins [[lein-figwheel "0.5.0-4"]]
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src"]
                         :figwheel     true
