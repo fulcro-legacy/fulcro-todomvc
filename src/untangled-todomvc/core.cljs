@@ -10,4 +10,4 @@
                :initial-state {}
                :started-callback (constantly nil)))
 
-(uc/mount app ui/Root "app")
+(uc/mount app ui/TodoList "app")
