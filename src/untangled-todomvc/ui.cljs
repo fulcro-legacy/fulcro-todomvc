@@ -60,7 +60,8 @@
           (dom/li nil
             (dom/a #js {:className "selected" :href "#"} "All")
             (dom/a #js {:href "#"} "Active")
-            (dom/a #js {:href "#"} "Completed"))))))
+            (dom/a #js {:href "#"} "Completed")))
+        (dom/button #js {:className "clear-completed"} "Clear Completed"))))
 
 
   (footer-info [this]
