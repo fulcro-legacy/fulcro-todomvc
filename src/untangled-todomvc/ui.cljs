@@ -1,5 +1,6 @@
 (ns untangled-todomvc.ui
   (:require [om.next :as om :refer-macros [defui]]
+            [untangled.client.mutations :as mut]
             [om.dom :as dom]))
 
 (defui TodoItem
@@ -9,14 +10,17 @@
   (ident [_ props] [:todo/by-id (:id props)])
   Object
   (render [this]
-    (dom/li nil
-      (dom/div #js {:className "view"}
-        (dom/input #js {:className "toggle" :type "checkbox"})
-        (dom/label nil "Remember the milk")
-        (dom/button #js {:className "destroy"}))
-      (dom/input #js {:className "edit"}))))
+    (let [{:keys [text completed]} (om/props this)]
+      (dom/li #js {:className (if completed "completed" "")}
+        (dom/div #js {:className "view"}
+          (dom/input #js {:className "toggle"
+                          :type      "checkbox"
+                          :onChange  #(mut/toggle! this :completed)})
+          (dom/label nil text)
+          (dom/button #js {:className "destroy"}))
+        (dom/input #js {:className "edit"})))))
 
-(def ui-todo-item (om/factory TodoItem))
+(def ui-todo-item (om/factory TodoItem {:keyfn :id}))
 
 (defui TodoList
   static om/IQuery
@@ -33,7 +37,7 @@
             (dom/input #js {:className "toggle-all" :type "checkbox"})
             (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
             (dom/ul #js {:className "todo-list"}
-              (ui-todo-item todos)))
+              (map ui-todo-item todos)))
 
           (.filter-footer this))
 
@@ -48,14 +52,15 @@
                       :autoFocus   true})))
 
   (filter-footer [this]
-    (dom/footer #js {:className "footer"}
-      (dom/span #js {:className "todo-count"}
-        (dom/strong nil "0") " items left")
-      (dom/ul #js {:className "filters"}
-        (dom/li nil
-          (dom/a #js {:className "selected" :href "#"} "All")
-          (dom/a #js {:href "#"} "Active")
-          (dom/a #js {:href "#"} "Completed")))))
+    (let [{:keys [todos]} (om/props this)]
+      (dom/footer #js {:className "footer"}
+        (dom/span #js {:className "todo-count"}
+          (dom/strong nil (count todos)) " items left")
+        (dom/ul #js {:className "filters"}
+          (dom/li nil
+            (dom/a #js {:className "selected" :href "#"} "All")
+            (dom/a #js {:href "#"} "Active")
+            (dom/a #js {:href "#"} "Completed"))))))
 
 
   (footer-info [this]
