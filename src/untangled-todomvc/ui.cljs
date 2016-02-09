@@ -45,11 +45,19 @@
         (.footer-info this))))
 
   (header [this]
-    (dom/header #js {:className "header"}
-      (dom/h1 nil "todos")
-      (dom/input #js {:className   "new-todo"
-                      :placeholder "What needs to be done?"
-                      :autoFocus   true})))
+    (letfn [(is-enter? [evt] (= 13 (.-keyCode evt)))
+            (make-new-item [evt]
+              (let [text (clojure.string/trim (.. evt -target -value))]
+                (when (and (is-enter? evt) (not (empty? text)))
+                  (om/transact! this `[(todo/new-item ~{:text text})])
+                  (set! (.. evt -target -value) ""))))]
+
+      (dom/header #js {:className "header"}
+        (dom/h1 nil "todos")
+        (dom/input #js {:className   "new-todo"
+                        :placeholder "What needs to be done?"
+                        :autoFocus   true
+                        :onKeyDown   make-new-item}))))
 
   (filter-footer [this]
     (let [{:keys [todos]} (om/props this)]
