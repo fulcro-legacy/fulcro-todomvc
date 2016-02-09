@@ -2,6 +2,7 @@
   (:require [untangled.client.core :as uc]
             [untangled-todomvc.ui :as ui]
             [untangled-todomvc.initial-state :as s]
+            untangled-todomvc.mutations
             [cljs.pprint :refer [pprint]]
             [devtools.core :as devtools]))
 

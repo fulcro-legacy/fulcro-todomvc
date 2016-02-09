@@ -10,14 +10,16 @@
   (ident [_ props] [:todo/by-id (:id props)])
   Object
   (render [this]
-    (let [{:keys [text completed]} (om/props this)]
+    (let [{:keys [id text completed]} (om/props this)
+          onDelete (om/get-computed this :onDelete)]
       (dom/li #js {:className (if completed "completed" "")}
         (dom/div #js {:className "view"}
           (dom/input #js {:className "toggle"
                           :type      "checkbox"
                           :onChange  #(mut/toggle! this :completed)})
           (dom/label nil text)
-          (dom/button #js {:className "destroy"}))
+          (dom/button #js {:className "destroy"
+                           :onClick   #(onDelete id)}))
         (dom/input #js {:className "edit"})))))
 
 (def ui-todo-item (om/factory TodoItem {:keyfn :id}))
@@ -27,20 +29,22 @@
   (query [this] [{:todos (om/get-query TodoItem)}])
   Object
   (render [this]
-    (let [{:keys [todos]} (om/props this)]
+    (let [{:keys [todos]} (om/props this)
+          delete-item (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))]
       (dom/div nil
         (dom/section #js {:className "todoapp"}
 
           (.header this)
 
-          (dom/section #js {:className "main"}
-            (dom/input #js {:className "toggle-all" :type "checkbox"})
-            (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
-            (dom/ul #js {:className "todo-list"}
-              (map ui-todo-item todos)))
+          (when (pos? (count todos))
+            (dom/div nil
+              (dom/section #js {:className "main"}
+                (dom/input #js {:className "toggle-all" :type "checkbox"})
+                (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
+                (dom/ul #js {:className "todo-list"}
+                  (map #(ui-todo-item (om/computed % {:onDelete delete-item})) todos)))
 
-          (.filter-footer this))
-
+              (.filter-footer this))))
 
         (.footer-info this))))
 
