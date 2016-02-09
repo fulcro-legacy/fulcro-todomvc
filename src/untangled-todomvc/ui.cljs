@@ -16,7 +16,7 @@
         (dom/div #js {:className "view"}
           (dom/input #js {:className "toggle"
                           :type      "checkbox"
-                          :onChange  #(mut/toggle! this :completed)})
+                          :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id}) :todos/num-completed])})
           (dom/label nil text)
           (dom/button #js {:className "destroy"
                            :onClick   #(onDelete id)}))
@@ -26,20 +26,24 @@
 
 (defui TodoList
   static om/IQuery
-  (query [this] [{:todos (om/get-query TodoItem)}])
+  (query [this] [{:todos (om/get-query TodoItem)}
+                 :todos/num-completed])
   Object
   (render [this]
-    (let [{:keys [todos]} (om/props this)
+    (let [{:keys [todos todos/num-completed]} (om/props this)
+          num-todos (count todos)
           delete-item (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))]
       (dom/div nil
         (dom/section #js {:className "todoapp"}
 
           (.header this)
 
-          (when (pos? (count todos))
+          (when (pos? num-todos)
             (dom/div nil
               (dom/section #js {:className "main"}
-                (dom/input #js {:className "toggle-all" :type "checkbox"})
+                (dom/input #js {:className "toggle-all"
+                                :type      "checkbox"
+                                :checked   (= num-completed num-todos)})
                 (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
                 (dom/ul #js {:className "todo-list"}
                   (map #(ui-todo-item (om/computed % {:onDelete delete-item})) todos)))
@@ -64,10 +68,10 @@
                         :onKeyDown   make-new-item}))))
 
   (filter-footer [this]
-    (let [{:keys [todos]} (om/props this)]
+    (let [{:keys [todos todos/num-completed]} (om/props this)]
       (dom/footer #js {:className "footer"}
         (dom/span #js {:className "todo-count"}
-          (dom/strong nil (count todos)) " items left")
+          (dom/strong nil (- (count todos) num-completed)) " items left")
         (dom/ul #js {:className "filters"}
           (dom/li nil
             (dom/a #js {:className "selected" :href "#"} "All")
