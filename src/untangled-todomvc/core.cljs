@@ -15,5 +15,5 @@
                :initial-state {}
                :started-callback (constantly nil)))
 
-(uc/mount app ui/TodoList "app")
+(def mounted-app (uc/mount app ui/TodoList "app"))
 

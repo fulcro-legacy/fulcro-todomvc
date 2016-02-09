@@ -43,7 +43,8 @@
               (dom/section #js {:className "main"}
                 (dom/input #js {:className "toggle-all"
                                 :type      "checkbox"
-                                :checked   (= num-completed num-todos)})
+                                :checked   (= num-completed num-todos)
+                                :onClick #(om/transact! this `[(todo/toggle-all) :todos/num-completed])})
                 (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
                 (dom/ul #js {:className "todo-list"}
                   (map #(ui-todo-item (om/computed % {:onDelete delete-item})) todos)))
@@ -68,16 +69,18 @@
                         :onKeyDown   make-new-item}))))
 
   (filter-footer [this]
-    (let [{:keys [todos todos/num-completed]} (om/props this)]
+    (let [{:keys [todos todos/num-completed]} (om/props this)
+          num-todos (count todos)]
       (dom/footer #js {:className "footer"}
         (dom/span #js {:className "todo-count"}
-          (dom/strong nil (- (count todos) num-completed)) " items left")
+          (dom/strong nil (- num-todos num-completed)) " items left")
         (dom/ul #js {:className "filters"}
           (dom/li nil
             (dom/a #js {:className "selected" :href "#"} "All")
             (dom/a #js {:href "#"} "Active")
             (dom/a #js {:href "#"} "Completed")))
-        (dom/button #js {:className "clear-completed"} "Clear Completed"))))
+        (when (pos? num-completed)
+          (dom/button #js {:className "clear-completed"} "Clear Completed")))))
 
 
   (footer-info [this]
