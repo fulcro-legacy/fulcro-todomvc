@@ -82,7 +82,8 @@
             (dom/a #js {:href "#"} "Active")
             (dom/a #js {:href "#"} "Completed")))
         (when (pos? num-completed)
-          (dom/button #js {:className "clear-completed"} "Clear Completed")))))
+          (dom/button #js {:className "clear-completed"
+                           :onClick #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
 
 
   (footer-info [this]

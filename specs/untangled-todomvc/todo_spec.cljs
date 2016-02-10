@@ -41,12 +41,12 @@
         (get-in @to-active-state [:todo/by-id 1 :completed]) => false))))
 
 (specification "Toggling the completion of all todos"
-  (let [to-complete-state (atom {:todos               [[:todo/by-id 1]]
+  (let [to-complete-state (atom {:todos               [[:todo/by-id 1] [:todo/by-id 2]]
                                  :todo/by-id          {1 {:id 1 :text "Hello"}
                                                        2 {:id 2 :text "Bye" :completed true}}
                                  :todos/num-completed 1})
 
-        to-active-state (atom {:todos               [[:todo/by-id 1]]
+        to-active-state (atom {:todos               [[:todo/by-id 1] [:todo/by-id 2]]
                                :todo/by-id          {1 {:id 1 :text "Hello" :completed true}
                                                      2 {:id 2 :text "Bye" :completed true}}
                                :todos/num-completed 2})]
@@ -78,3 +78,18 @@
             (not
               (reduce
                 (fn [acc todo] (or acc (:completed todo))) false todos))))))))
+
+(specification "Clear completed todos"
+  (let [state (atom {:todos               [[:todo/by-id 1] [:todo/by-id 2]]
+                     :todo/by-id          {1 {:id 1 :text "Hello"}
+                                           2 {:id 2 :text "Bye" :completed true}}
+                     :todos/num-completed 1})]
+
+    ((:action (m/mutate {:state state} 'todo/clear-complete {})))
+
+    (assertions
+      "removes completed todos from app state."
+      (:todos @state) => [[:todo/by-id 1]]
+      (:todo/by-id @state) => {1 {:id 1 :text "Hello"}}
+      "sets the count of completed items to 0."
+      (:todos/num-completed @state) => 0)))
