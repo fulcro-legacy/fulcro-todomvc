@@ -59,11 +59,11 @@
         (:todos/num-completed @to-complete-state) => (count (:todos @to-complete-state))
 
         "marks all todo items as complete."
-        (vals (:todo/by-id @to-complete-state))
-        =fn=> (fn [todos]
-                (when (some? todos)
-                  (reduce
-                    (fn [acc todo] (and acc (:completed todo))) true todos)))))
+        (vals (:todo/by-id @to-complete-state)) =fn=>
+        (fn [todos]
+          (when (some? todos)
+            (reduce
+              (fn [acc todo] (and acc (:completed todo))) true todos)))))
 
     (behavior "when toggling to active status"
       ((:action (m/mutate {:state to-active-state} 'todo/toggle-all {:all-completed? true})))
@@ -72,9 +72,9 @@
         "sets the number of completed todos to 0."
         (:todos/num-completed @to-active-state) => 0
         "marks all todo items as active."
-        (vals (:todo/by-id @to-active-state))
-        =fn=> (fn [todos]
-                (when (some? todos)
-                  (not
-                    (reduce
-                      (fn [acc todo] (or acc (:completed todo))) false todos))))))))
+        (vals (:todo/by-id @to-active-state)) =fn=>
+        (fn [todos]
+          (when (some? todos)
+            (not
+              (reduce
+                (fn [acc todo] (or acc (:completed todo))) false todos))))))))

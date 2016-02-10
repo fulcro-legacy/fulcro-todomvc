@@ -22,18 +22,20 @@
                        (into {} (map (fn [[k v]] [k (assoc v :completed val)]) todos)))]
 
                (if all-completed?
-                 (do (swap! state assoc :todos/num-completed 0)
-                     (swap! state update :todo/by-id (partial set-completed false)))
-
-                 (do (swap! state assoc :todos/num-completed (count (:todos @state)))
-                     (swap! state update :todo/by-id (partial set-completed true))))))})
+                 (swap! state #(-> %
+                                (assoc :todos/num-completed 0)
+                                (update :todo/by-id (partial set-completed false))))
+                 (swap! state #(-> %
+                                (assoc :todos/num-completed (count (:todos @state)))
+                                (update :todo/by-id (partial set-completed true)))))))})
 
 (defmethod m/mutate 'todo/delete-item [{:keys [state]} _ {:keys [id]}]
   {:action (fn []
              (letfn [(remove-item [todos] (vec (remove #(= id (second %)) todos)))]
-               (swap! state #(if (get-in % [:todo/by-id id :completed])
-                              (update % :todos/num-completed dec)
-                              %))
+
+               (when (get-in @state [:todo/by-id id :completed])
+                 (swap! state update :todos/num-completed dec))
+
                (swap! state #(-> %
                               (update :todos remove-item)
                               (update :todo/by-id dissoc id)))))})
