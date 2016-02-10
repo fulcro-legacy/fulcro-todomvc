@@ -16,7 +16,7 @@
         (dom/div #js {:className "view"}
           (dom/input #js {:className "toggle"
                           :type      "checkbox"
-                          :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id}) :todos/num-completed])})
+                          :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id})])})
           (dom/label nil text)
           (dom/button #js {:className "destroy"
                            :onClick   #(onDelete id)}))
@@ -44,7 +44,7 @@
                 (dom/input #js {:className "toggle-all"
                                 :type      "checkbox"
                                 :checked   (= num-completed num-todos)
-                                :onClick #(om/transact! this `[(todo/toggle-all) :todos/num-completed])})
+                                :onClick #(om/transact! this `[(todo/toggle-all) :todos])})
                 (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
                 (dom/ul #js {:className "todo-list"}
                   (map #(ui-todo-item (om/computed % {:onDelete delete-item})) todos)))
