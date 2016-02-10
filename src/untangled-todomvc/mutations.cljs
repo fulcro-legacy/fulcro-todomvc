@@ -16,12 +16,17 @@
              (swap! state (fn [st] (update st :todos/num-completed
                                      (if (get-in st [:todo/by-id id :completed]) inc dec)))))})
 
-(defmethod m/mutate 'todo/toggle-all [{:keys [state]} _ _]
+(defmethod m/mutate 'todo/toggle-all [{:keys [state]} _ {:keys [all-completed?]}]
   {:action (fn []
-             (let [updated-todos (into {} (map (fn [[id data]] [id (assoc data :completed false)]) (get @state :todo/by-id)))]
-               (swap! state #(-> %
-                              (assoc :todos/num-completed 0)
-                              (assoc :todo/by-id updated-todos)))))})
+             (letfn [(set-completed [val todos]
+                       (into {} (map (fn [[k v]] [k (assoc v :completed val)]) todos)))]
+
+               (if all-completed?
+                 (do (swap! state assoc :todos/num-completed 0)
+                     (swap! state update :todo/by-id (partial set-completed false)))
+
+                 (do (swap! state assoc :todos/num-completed (count (:todos @state)))
+                     (swap! state update :todo/by-id (partial set-completed true))))))})
 
 (defmethod m/mutate 'todo/delete-item [{:keys [state]} _ {:keys [id]}]
   {:action (fn []
