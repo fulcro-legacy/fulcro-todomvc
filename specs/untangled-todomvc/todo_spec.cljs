@@ -40,6 +40,15 @@
         "marks todo as active."
         (get-in @to-active-state [:todo/by-id 1 :completed]) => false))))
 
+(specification "Editing a todo"
+  (let [state (atom {:todos      [[:todo/by-id 1]]
+                     :todo/by-id {1 {:id 1 :text "Hello"}}})]
+
+    ((:action (m/mutate {:state state} 'todo/edit {:id 1 :text "Goodbye"})))
+    (assertions
+      "changes the text for that todo in the app state."
+      (get-in @state [:todo/by-id 1 :text]) => "Goodbye")))
+
 (specification "Toggling the completion of all todos"
   (let [to-complete-state (atom {:todos               [[:todo/by-id 1] [:todo/by-id 2]]
                                  :todo/by-id          {1 {:id 1 :text "Hello"}

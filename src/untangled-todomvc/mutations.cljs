@@ -16,6 +16,21 @@
              (swap! state (fn [st] (update st :todos/num-completed
                                      (if (get-in st [:todo/by-id id :completed]) inc dec)))))})
 
+(defmethod m/mutate 'todo/edit [{:keys [state]} _ {:keys [id text]}]
+  {:action (fn []
+             (swap! state assoc-in [:todo/by-id id :text] text))})
+
+(defmethod m/mutate 'todo/delete-item [{:keys [state]} _ {:keys [id]}]
+  {:action (fn []
+             (letfn [(remove-item [todos] (vec (remove #(= id (second %)) todos)))]
+
+               (when (get-in @state [:todo/by-id id :completed])
+                 (swap! state update :todos/num-completed dec))
+
+               (swap! state #(-> %
+                              (update :todos remove-item)
+                              (update :todo/by-id dissoc id)))))})
+
 (defmethod m/mutate 'todo/toggle-all [{:keys [state]} _ {:keys [all-completed?]}]
   {:action (fn []
              (letfn [(set-completed [val todos]
@@ -29,21 +44,8 @@
                                 (assoc :todos/num-completed (count (:todos @state)))
                                 (update :todo/by-id (partial set-completed true)))))))})
 
-(defmethod m/mutate 'todo/delete-item [{:keys [state]} _ {:keys [id]}]
-  {:action (fn []
-             (letfn [(remove-item [todos] (vec (remove #(= id (second %)) todos)))]
-
-               (when (get-in @state [:todo/by-id id :completed])
-                 (swap! state update :todos/num-completed dec))
-
-               (swap! state #(-> %
-                              (update :todos remove-item)
-                              (update :todo/by-id dissoc id)))))})
-
 (defmethod m/mutate 'todo/clear-complete [{:keys [state]} _ _]
   {:action (fn []
-             ;; dissoc them from :todo/by-id
-             ;; remove them from :todos
              (let [todos (vals (get @state :todo/by-id))
                    completed-todo-ids (set (keep #(when (:completed %) (:id %)) todos))]
 

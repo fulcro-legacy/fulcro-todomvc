@@ -9,7 +9,7 @@
                  [org.omcljs/om "1.0.0-alpha30"]
                  [untangled-client "0.4.2-SNAPSHOT"]
                  [binaryage/devtools "0.5.2"]
-                 [untangled-spec "0.3.1" :scope "test"]]
+                 [untangled-spec "0.3.2" :scope "test"]]
 
   :plugins [[lein-figwheel "0.5.0-5"]]
 

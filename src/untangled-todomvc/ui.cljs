@@ -1,7 +1,15 @@
 (ns untangled-todomvc.ui
   (:require [om.next :as om :refer-macros [defui]]
             [untangled.client.mutations :as mut]
-            [om.dom :as dom]))
+            [om.dom :as dom]
+            [untangled.client.logging :as log]))
+
+(defn is-enter? [evt] (= 13 (.-keyCode evt)))
+
+(defn validate-text-input [evt callback]
+  (let [trimmted-text (clojure.string/trim (.. evt -target -value))]
+    (when (and (is-enter? evt) (not (empty? trimmted-text)))
+      (callback evt trimmted-text))))
 
 (defui TodoItem
   static om/IQuery
@@ -9,19 +17,31 @@
   static om/Ident
   (ident [_ props] [:todo/by-id (:id props)])
   Object
+  (componentDidUpdate [this prev-props _]
+    (when (and (not (:editing prev-props)) (:editing (om/props this)))
+      (let [input-field (js/ReactDOM.findDOMNode (.. this -refs -edit_field))]
+        (.focus input-field)
+        (.setSelectionRange input-field (.. input-field -value -length) (.. input-field -value -length)))))
+
   (render [this]
-    (let [{:keys [id text completed]} (om/props this)
+    (let [{:keys [id text completed editing]} (om/props this)
           onDelete (om/get-computed this :onDelete)]
-      (dom/li #js {:className (if completed "completed" "")}
+      (dom/li #js {:className (cond-> ""
+                                completed (str "completed")
+                                editing (str " editing"))}
         (dom/div #js {:className "view"}
           (dom/input #js {:className "toggle"
                           :type      "checkbox"
                           :checked   completed
                           :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id}) :todos/num-completed])})
-          (dom/label nil text)
+          (dom/label #js {:onDoubleClick (fn []
+                                           (mut/toggle! this :editing))} text)
           (dom/button #js {:className "destroy"
                            :onClick   #(onDelete id)}))
-        (dom/input #js {:className "edit"})))))
+        (dom/input #js {:className "edit"
+                        :value     text
+                        :ref       "edit_field"
+                        :onKeyDown #(validate-text-input % (fn [_ text] (om/transact! this `[(todo/edit ~{:id id :text text})])))})))))
 
 (def ui-todo-item (om/factory TodoItem {:keyfn :id}))
 
@@ -56,19 +76,18 @@
         (.footer-info this))))
 
   (header [this]
-    (letfn [(is-enter? [evt] (= 13 (.-keyCode evt)))
-            (make-new-item [evt]
-              (let [text (clojure.string/trim (.. evt -target -value))]
-                (when (and (is-enter? evt) (not (empty? text)))
-                  (om/transact! this `[(todo/new-item ~{:text text})])
-                  (set! (.. evt -target -value) ""))))]
+    (letfn [(add-item [evt text]
+              (om/transact! this `[(todo/new-item ~{:text text})])
+              (set! (.. evt -target -value) ""))
+            (validate-new-item [evt]
+              (validate-text-input evt add-item))]
 
       (dom/header #js {:className "header"}
         (dom/h1 nil "todos")
         (dom/input #js {:className   "new-todo"
                         :placeholder "What needs to be done?"
                         :autoFocus   true
-                        :onKeyDown   make-new-item}))))
+                        :onKeyDown   validate-new-item}))))
 
   (filter-footer [this]
     (let [{:keys [todos todos/num-completed]} (om/props this)
@@ -83,8 +102,7 @@
             (dom/a #js {:href "#"} "Completed")))
         (when (pos? num-completed)
           (dom/button #js {:className "clear-completed"
-                           :onClick #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
-
+                           :onClick   #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
 
   (footer-info [this]
     (dom/footer #js {:className "info"}
