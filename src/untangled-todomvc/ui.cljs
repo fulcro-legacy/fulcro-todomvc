@@ -17,15 +17,25 @@
   static om/Ident
   (ident [_ props] [:todo/by-id (:id props)])
   Object
+  (initLocalState [this]
+    {:edit-text (:text (om/props this))})
+
   (componentDidUpdate [this prev-props _]
     (when (and (not (:editing prev-props)) (:editing (om/props this)))
-      (let [input-field (js/ReactDOM.findDOMNode (.. this -refs -edit_field))]
+      (let [input-field (js/ReactDOM.findDOMNode (.. this -refs -edit_field))
+            input-field-length (.. input-field -value -length)]
         (.focus input-field)
-        (.setSelectionRange input-field (.. input-field -value -length) (.. input-field -value -length)))))
+        (.setSelectionRange input-field input-field-length input-field-length))))
 
   (render [this]
     (let [{:keys [id text completed editing]} (om/props this)
-          onDelete (om/get-computed this :onDelete)]
+          edit-text (om/get-state this :edit-text)
+          onDelete (om/get-computed this :onDelete)
+          edit-transaction (fn [_ text]
+                             (om/transact! this `[(todo/edit ~{:id id :text text})])
+                             (mut/toggle! this :editing))
+          validate-edit (fn [evt] (validate-text-input evt edit-transaction))]
+
       (dom/li #js {:className (cond-> ""
                                 completed (str "completed")
                                 editing (str " editing"))}
@@ -34,14 +44,14 @@
                           :type      "checkbox"
                           :checked   completed
                           :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id}) :todos/num-completed])})
-          (dom/label #js {:onDoubleClick (fn []
-                                           (mut/toggle! this :editing))} text)
+          (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} text)
           (dom/button #js {:className "destroy"
                            :onClick   #(onDelete id)}))
         (dom/input #js {:className "edit"
-                        :value     text
+                        :value     edit-text
+                        :onChange  #(om/update-state! this assoc :edit-text (.. % -target -value))
                         :ref       "edit_field"
-                        :onKeyDown #(validate-text-input % (fn [_ text] (om/transact! this `[(todo/edit ~{:id id :text text})])))})))))
+                        :onKeyDown validate-edit})))))
 
 (def ui-todo-item (om/factory TodoItem {:keyfn :id}))
 
