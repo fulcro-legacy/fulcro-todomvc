@@ -5,11 +5,13 @@
             [untangled.client.logging :as log]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
+(defn is-escape? [evt] (= 27 (.-keyCode evt)))
 
-(defn validate-text-input [evt callback]
-  (let [trimmted-text (clojure.string/trim (.. evt -target -value))]
-    (when (and (is-enter? evt) (not (empty? trimmted-text)))
-      (callback evt trimmted-text))))
+(defn trim-text [text]
+  "Returns text without surrounding whitespace if not empty, otherwise nil"
+  (let [trimmed-text (clojure.string/trim text)]
+    (when-not (empty? trimmed-text)
+      trimmed-text)))
 
 (defui TodoItem
   static om/IQuery
@@ -32,10 +34,13 @@
     (let [{:keys [id text completed editing]} (om/props this)
           edit-text (om/get-state this :edit-text)
           onDelete (om/get-computed this :onDelete)
-          edit-transaction (fn [_ text]
-                             (om/transact! this `[(todo/edit ~{:id id :text text})])
-                             (mut/toggle! this :editing))
-          validate-edit (fn [evt] (validate-text-input evt edit-transaction))]
+          submit-edit (fn [evt]
+                        (if-let [trimmed-text (trim-text (.. evt -target -value))]
+                          (do (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
+                              (mut/toggle! this :editing))
+                          (onDelete id)))]
+
+      (log/set-level :debug)
 
       (dom/li #js {:className (cond-> ""
                                 completed (str "completed")
@@ -49,10 +54,21 @@
           (dom/button #js {:className "destroy"
                            :onClick   #(onDelete id)}))
         (dom/input #js {:className "edit"
+                        :ref       "edit_field"
                         :value     edit-text
                         :onChange  #(om/update-state! this assoc :edit-text (.. % -target -value))
-                        :ref       "edit_field"
-                        :onKeyDown validate-edit})))))
+                        :onKeyDown #(cond
+                                     (is-enter? %) (submit-edit %)
+                                     (is-escape? %) (do (om/update-state! this assoc :edit-text text)
+                                                        (mut/toggle! this :editing)))
+                        :onBlur    #(when-not (or (is-enter? %) (is-escape? %)) (submit-edit %))})))))
+
+;; Edit existing todo:
+;;   - on blur and enter
+;;     - if trimmed empty, delete
+;;     - submit edit
+;;   - on escape key
+;;     - restore previous text
 
 (def ui-todo-item (om/factory TodoItem {:keyfn :id}))
 
@@ -87,18 +103,18 @@
         (.footer-info this))))
 
   (header [this]
-    (letfn [(add-item [evt text]
-              (om/transact! this `[(todo/new-item ~{:text text})])
-              (set! (.. evt -target -value) ""))
-            (validate-new-item [evt]
-              (validate-text-input evt add-item))]
+    (letfn [(add-item [evt]
+              (when (is-enter? evt)
+                (when-let [trimmed-text (trim-text (.. evt -target -value))]
+                  (om/transact! this `[(todo/new-item ~{:text trimmed-text})])
+                  (set! (.. evt -target -value) ""))))]
 
       (dom/header #js {:className "header"}
         (dom/h1 nil "todos")
         (dom/input #js {:className   "new-todo"
                         :placeholder "What needs to be done?"
                         :autoFocus   true
-                        :onKeyDown   validate-new-item}))))
+                        :onKeyDown   add-item}))))
 
   (filter-footer [this]
     (let [{:keys [todos todos/num-completed]} (om/props this)

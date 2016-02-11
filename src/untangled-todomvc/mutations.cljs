@@ -50,6 +50,10 @@
                    completed-todo-ids (set (keep #(when (:completed %) (:id %)) todos))]
 
                (swap! state assoc :todos/num-completed 0)
-               (swap! state (fn [st] (-> st
-                                       (update :todos (fn [todos] (vec (remove #(contains? completed-todo-ids (second %)) todos))))
-                                       (update :todo/by-id (fn [todos] (into {} (remove (fn [[k _]] (contains? completed-todo-ids k)) todos)))))))))})
+               (swap! state (fn [st]
+                              (-> st
+                                (update :todos
+                                  (fn [todos] (vec (remove #(contains? completed-todo-ids (second %)) todos))))
+                                (update :todo/by-id
+                                  (fn [todos] (into {}
+                                                (remove (fn [[k _]] (contains? completed-todo-ids k)) todos)))))))))})
