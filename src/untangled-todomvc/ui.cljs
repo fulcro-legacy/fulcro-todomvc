@@ -21,6 +21,7 @@
     {:edit-text (:text (om/props this))})
 
   (componentDidUpdate [this prev-props _]
+    ;; Code adapted from React TodoMVC implementation
     (when (and (not (:editing prev-props)) (:editing (om/props this)))
       (let [input-field (js/ReactDOM.findDOMNode (.. this -refs -edit_field))
             input-field-length (.. input-field -value -length)]

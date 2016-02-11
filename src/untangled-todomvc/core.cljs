@@ -11,9 +11,10 @@
 
 (enable-console-print!)
 
-(defonce app (uc/new-untangled-client
-               :initial-state {}
-               :started-callback (constantly nil)))
+(defonce app (atom (uc/new-untangled-client
+                     :initial-state {}
+                     :started-callback (constantly nil))))
 
-(def mounted-app (uc/mount app ui/TodoList "app"))
+(def mounted-app
+  (reset! app (uc/mount @app ui/TodoList "app")))
 
