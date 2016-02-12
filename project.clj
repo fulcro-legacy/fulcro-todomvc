@@ -1,4 +1,4 @@
-(defproject untangled-todomvc "0.1.0"
+(defproject untangled-todomvc "0.2.0-SNAPSHOT"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
   :license {:name "NAVIS"
