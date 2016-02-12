@@ -1,4 +1,4 @@
-(defproject untangled-todomvc "0.1.0-SNAPSHOT"
+(defproject untangled-todomvc "0.1.0"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
   :license {:name "NAVIS"
@@ -7,7 +7,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha30"]
-                 [untangled-client "0.4.2-SNAPSHOT"]
+                 [untangled-client "0.4.1"]
                  [binaryage/devtools "0.5.2"]
                  [untangled-spec "0.3.2" :scope "test"]]
 
@@ -34,4 +34,6 @@
                                        :output-dir "resources/public/js/compiled/specs"}}]}
 
   :figwheel {:css-dirs    ["resources/public/css"]
-             :server-port 2345})
+             :server-port 2345}
+
+  :repositories [["releases" "https://artifacts.buehner-fry.com/artifactory/release"]])

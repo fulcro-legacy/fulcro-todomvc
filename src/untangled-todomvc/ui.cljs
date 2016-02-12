@@ -13,7 +13,7 @@
     (when-not (empty? trimmed-text)
       trimmed-text)))
 
-(defui TodoItem
+(defui ^:once TodoItem
   static om/IQuery
   (query [_] [:id :text :completed :editing])
   static om/Ident
@@ -61,18 +61,11 @@
                                      (is-enter? %) (submit-edit %)
                                      (is-escape? %) (do (om/update-state! this assoc :edit-text text)
                                                         (mut/toggle! this :editing)))
-                        :onBlur    #(when-not (or (is-enter? %) (is-escape? %)) (submit-edit %))})))))
-
-;; Edit existing todo:
-;;   - on blur and enter
-;;     - if trimmed empty, delete
-;;     - submit edit
-;;   - on escape key
-;;     - restore previous text
+                        :onBlur    #(when editing (submit-edit %))})))))
 
 (def ui-todo-item (om/factory TodoItem {:keyfn :id}))
 
-(defui TodoList
+(defui ^:once TodoList
   static om/IQuery
   (query [this] [{:todos (om/get-query TodoItem)}
                  :todos/num-completed])
