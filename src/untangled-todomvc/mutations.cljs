@@ -1,14 +1,16 @@
 (ns untangled-todomvc.mutations
   (:require [untangled.client.mutations :as m]
-            [untangled.client.logging :as log]
-            [om.next :as om]))
+            [untangled-todomvc.utils :as util]
+            [om.next :as om]
+            [untangled.client.logging :as log]))
 
 (defmethod m/mutate 'todo/new-item [{:keys [state]} _ {:keys [text]}]
   {:action (fn []
              (let [id (om/tempid)]
                (swap! state #(-> %
                               (update :todos (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
-                              (assoc-in [:todo/by-id id] {:id id :text text})))))})
+                              (assoc-in [:todo/by-id id] {:id id :text text})))
+               (util/update-storage! #(conj % {:id id :text text :completed false}))))})
 
 (defmethod m/mutate 'todo/toggle-complete [{:keys [state]} _ {:keys [id]}]
   {:action (fn []
