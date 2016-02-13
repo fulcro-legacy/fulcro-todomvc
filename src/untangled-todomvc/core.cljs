@@ -13,9 +13,7 @@
 (enable-console-print!)
 
 (defonce app (atom (uc/new-untangled-client
-                     :initial-state {:todos (if-let [storage (util/get-storage!)]
-                                              storage
-                                              (do (util/set-storage! []) []))}
+                     :initial-state (if-let [storage (util/get-storage)] storage {})
                      :started-callback (constantly nil))))
 
 (reset! app (uc/mount @app ui/TodoList "app"))

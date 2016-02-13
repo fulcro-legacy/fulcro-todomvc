@@ -9,8 +9,7 @@
              (let [id (om/tempid)]
                (swap! state #(-> %
                               (update :todos (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
-                              (assoc-in [:todo/by-id id] {:id id :text text})))
-               (util/update-storage! #(conj % {:id id :text text :completed false}))))})
+                              (assoc-in [:todo/by-id id] {:id id :text text})))))})
 
 (defmethod m/mutate 'todo/toggle-complete [{:keys [state]} _ {:keys [id]}]
   {:action (fn []

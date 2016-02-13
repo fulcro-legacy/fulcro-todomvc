@@ -1,20 +1,23 @@
 (ns untangled-todomvc.utils
   (:require
-    [cljs.reader :as reader]
+    [cognitect.transit :as t]
     [untangled.client.logging :as log]))
 
 (def storage-key "todos-untangled")
 
+(def reader (t/reader :json))
+(def writer (t/writer :json))
+
 (log/set-level :debug)
 
+(defn get-storage []
+  (->> storage-key (.getItem (.-localStorage js/window)) (t/read reader)))
+
 (defn set-storage! [val]
-  (-> (.-localStorage js/window) (.setItem storage-key val)))
+  (->> val (t/write writer) (.setItem (.-localStorage js/window) storage-key)))
 
 (defn update-storage! [f]
-  (-> (.-localStorage js/window) (.setItem storage-key (log/debug (f (reader/read-string val))))))
-
-(defn get-storage! []
-  (-> (.-localStorage js/window) (.getItem storage-key) reader/read-string))
+  (set-storage! (f (get-storage))))
 
 (defn clear-storage! []
-  (-> (.-localStorage js/window) (.removeItem storage-key)))
+  (->> storage-key (.removeItem (.-localStorage js/window))))
