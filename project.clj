@@ -6,9 +6,8 @@
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
-                 [com.cognitect/transit-cljs "0.8.237"]
                  [org.omcljs/om "1.0.0-alpha30"]
-                 [untangled-client "0.4.1"]
+                 [untangled-client "0.4.2-SNAPSHOT"]
                  [binaryage/devtools "0.5.2"]
                  [untangled-spec "0.3.2" :scope "test"]]
 
