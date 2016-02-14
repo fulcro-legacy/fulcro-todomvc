@@ -40,8 +40,6 @@
                               (mut/toggle! this :editing))
                           (onDelete id)))]
 
-      (log/set-level :debug)
-
       (dom/li #js {:className (cond-> ""
                                 completed (str "completed")
                                 editing (str " editing"))}
@@ -111,10 +109,12 @@
 
   (filter-footer [this]
     (let [{:keys [todos todos/num-completed]} (om/props this)
-          num-todos (count todos)]
+          num-todos (count todos)
+          num-remaining (- num-todos num-completed)]
       (dom/footer #js {:className "footer"}
         (dom/span #js {:className "todo-count"}
-          (dom/strong nil (- num-todos num-completed)) " items left")
+          (dom/strong nil num-remaining)
+          (str (if (= num-remaining 1) " item" " items") " left"))
         (dom/ul #js {:className "filters"}
           (dom/li nil
             (dom/a #js {:className "selected" :href "#"} "All")
