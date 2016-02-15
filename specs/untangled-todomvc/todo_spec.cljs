@@ -116,3 +116,13 @@
         (:todo/by-id @state) => {1 {:id 1 :text "Hello"}}
         "sets the count of completed items to 0."
         (:todos/num-completed @state) => 0))))
+
+(specification "Can change the filter"
+  (let [state (atom {})]
+
+    (when-mocking
+      (util/set-storage! _) => nil
+
+      ((:action (m/mutate {:state state} 'todo/filter {:filter :my-filter})))
+      (assertions
+        (:todos/filter @state) => :my-filter))))

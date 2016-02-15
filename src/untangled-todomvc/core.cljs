@@ -19,7 +19,7 @@
 (defonce app (atom (uc/new-untangled-client
                      :initial-state (if-let [storage (util/get-storage)]
                                       (om/db->tree (om/get-query ui/TodoList) storage storage)
-                                      {})
+                                      {:todos/filter :none})
 
                      ;; Setting an atom in initial state not working as expected for untangled-client
                      #_(if-let [storage (util/get-storage)]
@@ -28,5 +28,3 @@
                      :started-callback (constantly nil))))
 
 (reset! app (uc/mount @app ui/TodoList "app"))
-
-(log/debug "Reconciler: " @(:reconciler @app))

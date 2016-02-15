@@ -66,3 +66,8 @@
                                   (fn [todos] (into {}
                                                 (remove (fn [[k _]] (contains? completed-todo-ids k)) todos)))))))
                (save-state state)))})
+
+(defmethod m/mutate 'todo/filter [{:keys [state]} _ {:keys [filter]}]
+  {:action (fn []
+             (swap! state assoc :todos/filter filter)
+             (save-state state))})
