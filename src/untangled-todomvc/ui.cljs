@@ -33,12 +33,12 @@
   (render [this]
     (let [{:keys [id text completed editing]} (om/props this)
           edit-text (om/get-state this :edit-text)
-          onDelete (om/get-computed this :onDelete)
+          delete-item (om/get-computed this :onDelete)
           submit-edit (fn [evt]
                         (if-let [trimmed-text (trim-text (.. evt -target -value))]
                           (do (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
                               (mut/toggle! this :editing))
-                          (onDelete id)))]
+                          (delete-item id)))]
 
       (dom/li #js {:className (cond-> ""
                                 completed (str "completed")
@@ -50,7 +50,7 @@
                           :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id}) :todos/num-completed])})
           (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} text)
           (dom/button #js {:className "destroy"
-                           :onClick   #(onDelete id)}))
+                           :onClick   #(delete-item id)}))
         (dom/input #js {:className "edit"
                         :ref       "edit_field"
                         :value     edit-text

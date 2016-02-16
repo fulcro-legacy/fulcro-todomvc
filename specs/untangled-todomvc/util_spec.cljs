@@ -21,11 +21,6 @@
       (util/clear-storage!)
       (is (nil? (util/get-storage))))
 
-    (behavior "Updates data using existing storage"
-      (util/set-storage! data)
-      (util/update-storage! #(assoc % :dharma :initiative))
-      (is (= (assoc data :dharma :initiative) (util/get-storage))))
-
     (util/clear-storage!)
     (set! util/storage-key storage-key)))
 
