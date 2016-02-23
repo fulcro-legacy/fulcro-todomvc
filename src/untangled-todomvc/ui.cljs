@@ -37,8 +37,10 @@
           delete-item (om/get-computed this :onDelete)
           submit-edit (fn [evt]
                         (if-let [trimmed-text (trim-text (.. evt -target -value))]
-                          (do (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
-                              (mut/toggle! this :editing))
+                          (do
+                            (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
+                            (om/update-state! this assoc :edit-text trimmed-text)
+                            (mut/toggle! this :editing))
                           (delete-item id)))]
 
       (dom/li #js {:className (cond-> ""
