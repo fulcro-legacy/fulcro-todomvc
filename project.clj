@@ -1,4 +1,4 @@
-(defproject untangled-todomvc "0.1.0"
+(defproject untangled-todomvc "0.2.0"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
   :license {:name "NAVIS"
@@ -7,7 +7,8 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha30"]
-                 [untangled-client "0.4.1"]
+                 [untangled-client "0.4.3"]
+                 [secretary "1.2.3"]
                  [binaryage/devtools "0.5.2"]
                  [untangled-spec "0.3.2" :scope "test"]]
 

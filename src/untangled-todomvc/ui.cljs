@@ -2,6 +2,7 @@
   (:require [om.next :as om :refer-macros [defui]]
             [untangled.client.mutations :as mut]
             [om.dom :as dom]
+            [untangled-todomvc.routing :as route]
             [untangled.client.logging :as log]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
@@ -33,14 +34,14 @@
   (render [this]
     (let [{:keys [id text completed editing]} (om/props this)
           edit-text (om/get-state this :edit-text)
-          onDelete (om/get-computed this :onDelete)
+          delete-item (om/get-computed this :onDelete)
           submit-edit (fn [evt]
                         (if-let [trimmed-text (trim-text (.. evt -target -value))]
-                          (do (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
-                              (mut/toggle! this :editing))
-                          (onDelete id)))]
-
-      (log/set-level :debug)
+                          (do
+                            (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
+                            (om/update-state! this assoc :edit-text trimmed-text)
+                            (mut/toggle! this :editing))
+                          (delete-item id)))]
 
       (dom/li #js {:className (cond-> ""
                                 completed (str "completed")
@@ -52,7 +53,7 @@
                           :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id}) :todos/num-completed])})
           (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} text)
           (dom/button #js {:className "destroy"
-                           :onClick   #(onDelete id)}))
+                           :onClick   #(delete-item id)}))
         (dom/input #js {:className "edit"
                         :ref       "edit_field"
                         :value     edit-text
@@ -68,13 +69,19 @@
 (defui ^:once TodoList
   static om/IQuery
   (query [this] [{:todos (om/get-query TodoItem)}
-                 :todos/num-completed])
+                 :todos/num-completed
+                 :todos/filter])
   Object
   (render [this]
-    (let [{:keys [todos todos/num-completed]} (om/props this)
+    (let [{:keys [todos todos/num-completed todos/filter]} (om/props this)
           num-todos (count todos)
           delete-item (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))
-          all-completed? (= num-completed num-todos)]
+          all-completed? (= num-completed num-todos)
+          filtered-todos (case filter
+                           :active (filterv (comp not :completed) todos)
+                           :completed (filterv :completed todos)
+                           todos)]
+
       (dom/div nil
         (dom/section #js {:className "todoapp"}
 
@@ -89,7 +96,7 @@
                                 :onClick   #(om/transact! this `[(todo/toggle-all ~{:all-completed? all-completed?})])})
                 (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
                 (dom/ul #js {:className "todo-list"}
-                  (map #(ui-todo-item (om/computed % {:onDelete delete-item})) todos)))
+                  (map #(ui-todo-item (om/computed % {:onDelete delete-item})) filtered-todos)))
 
               (.filter-footer this))))
 
@@ -110,16 +117,24 @@
                         :onKeyDown   add-item}))))
 
   (filter-footer [this]
-    (let [{:keys [todos todos/num-completed]} (om/props this)
-          num-todos (count todos)]
+    (let [{:keys [todos todos/num-completed todos/filter]} (om/props this)
+          num-todos (count todos)
+          num-remaining (- num-todos num-completed)]
+
       (dom/footer #js {:className "footer"}
         (dom/span #js {:className "todo-count"}
-          (dom/strong nil (- num-todos num-completed)) " items left")
+          (dom/strong nil num-remaining)
+          (str (if (= num-remaining 1) " item" " items") " left"))
         (dom/ul #js {:className "filters"}
           (dom/li nil
-            (dom/a #js {:className "selected" :href "#"} "All")
-            (dom/a #js {:href "#"} "Active")
-            (dom/a #js {:href "#"} "Completed")))
+            (dom/a #js {:className (when (or (nil? filter) (= :none filter)) "selected")
+                        :href      "#"} "All"))
+          (dom/li nil
+            (dom/a #js {:className (when (= :active filter) "selected")
+                        :href      "#/active"} "Active"))
+          (dom/li nil
+            (dom/a #js {:className (when (= :completed filter) "selected")
+                        :href      "#/completed"} "Completed")))
         (when (pos? num-completed)
           (dom/button #js {:className "clear-completed"
                            :onClick   #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
