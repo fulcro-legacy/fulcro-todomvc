@@ -1,7 +1,7 @@
 (ns untangled-todomvc.mutations
   (:require [untangled.client.mutations :as m]
             [untangled.dom :refer [unique-key]]
-            [untangled-todomvc.utils :as util]))
+            [untangled-todomvc.storage :as util]))
 
 (defn save-state [state] (util/set-storage! @state))
 

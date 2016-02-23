@@ -2,7 +2,7 @@
   (:require
     untangled-todomvc.mutations
     [untangled.client.mutations :as m]
-    [untangled-todomvc.utils :as util]
+    [untangled-todomvc.storage :as util]
     [untangled-spec.core :refer-macros [specification behavior assertions when-mocking]]
     [untangled.dom :refer [unique-key]]))
 

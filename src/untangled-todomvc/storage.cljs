@@ -1,4 +1,4 @@
-(ns untangled-todomvc.utils
+(ns untangled-todomvc.storage
   (:require [cljs.reader :as reader]))
 
 (def storage-key "todos-untangled")

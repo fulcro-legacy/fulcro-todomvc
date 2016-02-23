@@ -1,8 +1,8 @@
-(ns untangled-todomvc.util-spec
+(ns untangled-todomvc.storage-spec
   (:require
     [untangled-spec.core :refer-macros [specification behavior assertions when-mocking]]
     [cljs.test :refer-macros [is]]
-    [untangled-todomvc.utils :as util]
+    [untangled-todomvc.storage :as util]
     [cognitect.transit :as t]))
 
 (specification "Local storage"

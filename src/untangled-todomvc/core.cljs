@@ -1,7 +1,7 @@
 (ns untangled-todomvc.core
   (:require [untangled.client.core :as uc]
             [untangled-todomvc.ui :as ui]
-            [untangled-todomvc.utils :as util]
+            [untangled-todomvc.storage :as util]
             untangled-todomvc.mutations
             [untangled-todomvc.routing :refer [configure-routing!]]
             [devtools.core :as devtools]
