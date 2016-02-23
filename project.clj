@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha30"]
                  [untangled-client "0.4.2-SNAPSHOT"]
+                 [secretary "1.2.3"]
                  [binaryage/devtools "0.5.2"]
                  [untangled-spec "0.3.2" :scope "test"]]
 

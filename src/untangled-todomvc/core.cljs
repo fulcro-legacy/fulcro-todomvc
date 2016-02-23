@@ -3,7 +3,7 @@
             [untangled-todomvc.ui :as ui]
             [untangled-todomvc.utils :as util]
             untangled-todomvc.mutations
-            [cljs.pprint :refer [pprint]]
+            [untangled-todomvc.routing :refer [configure-routing!]]
             [devtools.core :as devtools]
             [untangled.client.logging :as log]
             [om.next :as om]))
@@ -23,8 +23,11 @@
 
                      ;; Setting an atom in initial state not working as expected for untangled-client
                      #_(if-let [storage (util/get-storage)]
-                                      (atom (log/debug "Storage" storage))
-                                      {})
+                         (atom (log/debug "Storage" storage))
+                         {})
                      :started-callback (constantly nil))))
 
 (reset! app (uc/mount @app ui/TodoList "app"))
+
+(configure-routing! (:reconciler @app))
+

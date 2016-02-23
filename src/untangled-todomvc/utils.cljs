@@ -1,7 +1,5 @@
 (ns untangled-todomvc.utils
-  (:require
-    [cljs.reader :as reader]
-    [untangled.client.logging :as log]))
+  (:require [cljs.reader :as reader]))
 
 (def storage-key "todos-untangled")
 
@@ -10,9 +8,6 @@
 
 (defn set-storage! [val]
   (->> val pr-str (.setItem js/localStorage storage-key)))
-
-(defn update-storage! [f]
-  (set-storage! (f (get-storage))))
 
 (defn clear-storage! []
   (->> storage-key (.removeItem js/localStorage)))
