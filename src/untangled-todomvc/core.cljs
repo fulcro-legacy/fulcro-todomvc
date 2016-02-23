@@ -2,15 +2,11 @@
   (:require [untangled.client.core :as uc]
             [untangled-todomvc.ui :as ui]
             [untangled-todomvc.utils :as util]
-            [secretary.core :as secretary :refer-macros [defroute]]
-            [goog.events :as events]
-            [goog.history.EventType :as EventType]
             untangled-todomvc.mutations
-            [cljs.pprint :refer [pprint]]
+            [untangled-todomvc.routing :refer [configure-routing!]]
             [devtools.core :as devtools]
             [untangled.client.logging :as log]
-            [om.next :as om])
-  (:import goog.History))
+            [om.next :as om]))
 
 (defonce cljs-build-tools
   (do (devtools/enable-feature! :sanity-hints)
@@ -33,18 +29,5 @@
 
 (reset! app (uc/mount @app ui/TodoList "app"))
 
-(secretary/set-config! :prefix "#")
+(configure-routing! (:reconciler @app))
 
-(defroute all-items "/" []
-  (om/transact! (:reconciler @app) `[(todo/filter ~{:filter :none})]))
-
-(defroute active-items "/active" []
-  (om/transact! (:reconciler @app) `[(todo/filter ~{:filter :active})]))
-
-(defroute completed-items "/completed" []
-  (om/transact! (:reconciler @app) `[(todo/filter ~{:filter :completed})]))
-
-(defonce history-tracking
-  (let [h (History.)]
-    (goog.events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
-    (doto h (.setEnabled true))))

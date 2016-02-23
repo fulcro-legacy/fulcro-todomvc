@@ -2,6 +2,7 @@
   (:require [om.next :as om :refer-macros [defui]]
             [untangled.client.mutations :as mut]
             [om.dom :as dom]
+            [untangled-todomvc.routing :as route]
             [untangled.client.logging :as log]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
@@ -116,8 +117,7 @@
   (filter-footer [this]
     (let [{:keys [todos todos/num-completed todos/filter]} (om/props this)
           num-todos (count todos)
-          num-remaining (- num-todos num-completed)
-          change-filter (fn [val] (om/transact! this `[(todo/filter ~{:filter val})]))]
+          num-remaining (- num-todos num-completed)]
 
       (dom/footer #js {:className "footer"}
         (dom/span #js {:className "todo-count"}
@@ -126,16 +126,13 @@
         (dom/ul #js {:className "filters"}
           (dom/li nil
             (dom/a #js {:className (when (or (nil? filter) (= :none filter)) "selected")
-                        :href      "#"
-                        :onClick   #(change-filter :none)} "All"))
+                        :href      "#"} "All"))
           (dom/li nil
             (dom/a #js {:className (when (= :active filter) "selected")
-                        :href      "#"
-                        :onClick   #(change-filter :active)} "Active"))
+                        :href      "#/active"} "Active"))
           (dom/li nil
             (dom/a #js {:className (when (= :completed filter) "selected")
-                        :href      "#"
-                        :onClick   #(change-filter :completed)} "Completed")))
+                        :href      "#/completed"} "Completed")))
         (when (pos? num-completed)
           (dom/button #js {:className "clear-completed"
                            :onClick   #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
