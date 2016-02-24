@@ -29,16 +29,12 @@
     (behavior "when toggling to complete"
       ((:action (m/mutate {:state to-complete-state} 'todo/toggle-complete {:id 1})))
       (assertions
-        "increments global count of completed todos."
-        (:todos/num-completed @to-complete-state) => 1
         "marks todo as completed."
         (get-in @to-complete-state [:todo/by-id 1 :completed]) => true))
 
     (behavior "when toggling to active"
       ((:action (m/mutate {:state to-active-state} 'todo/toggle-complete {:id 1})))
       (assertions
-        "decrements global count of completed todos."
-        (:todos/num-completed @to-active-state) => 0
         "marks todo as active."
         (get-in @to-active-state [:todo/by-id 1 :completed]) => false))))
 

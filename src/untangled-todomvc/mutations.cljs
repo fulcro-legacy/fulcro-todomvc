@@ -13,10 +13,7 @@
                               (assoc-in [:todo/by-id id] {:id id :text text})))))})
 
 (defmethod m/mutate 'todo/toggle-complete [{:keys [state]} _ {:keys [id]}]
-  {:action (fn []
-             (swap! state (fn [st] (update-in st [:todo/by-id id :completed] #(not %))))
-             (swap! state (fn [st] (update st :todos/num-completed
-                                     (if (get-in st [:todo/by-id id :completed]) inc dec)))))})
+  {:action (fn [] (swap! state (fn [st] (update-in st [:todo/by-id id :completed] #(not %)))))})
 
 (defmethod m/mutate 'todo/edit [{:keys [state]} _ {:keys [id text]}]
   {:action (fn [] (swap! state assoc-in [:todo/by-id id :text] text))})
