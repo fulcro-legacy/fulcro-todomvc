@@ -2,7 +2,7 @@
   (:require
     untangled-todomvc.mutations
     [untangled.client.mutations :as m]
-    [untangled-todomvc.storage :as util]
+    [untangled-todomvc.storage :as storage]
     [untangled-spec.core :refer-macros [specification behavior assertions when-mocking]]
     [untangled.dom :refer [unique-key]]))
 
@@ -10,7 +10,7 @@
   (let [state (atom {})]
     (when-mocking
       (unique-key) => :new-id
-      (util/set-storage! _) => nil
+      (storage/set-storage! _) => nil
 
       ((:action (m/mutate {:state state} 'todo/new-item {:text "Hello"})))
 
@@ -28,7 +28,7 @@
                                :todos/num-completed 1})]
 
     (when-mocking
-      (util/set-storage! _) => nil
+      (storage/set-storage! _) => nil
 
       (behavior "when toggling to complete"
         ((:action (m/mutate {:state to-complete-state} 'todo/toggle-complete {:id 1})))
@@ -51,7 +51,7 @@
                      :todo/by-id {1 {:id 1 :text "Hello"}}})]
 
     (when-mocking
-      (util/set-storage! _) => nil
+      (storage/set-storage! _) => nil
 
       ((:action (m/mutate {:state state} 'todo/edit {:id 1 :text "Goodbye"})))
       (assertions
@@ -70,7 +70,7 @@
                                :todos/num-completed 2})]
 
     (when-mocking
-      (util/set-storage! _) => nil
+      (storage/set-storage! _) => nil
 
       (behavior "when toggling to complete status"
         ((:action (m/mutate {:state to-complete-state} 'todo/toggle-all {:all-completed? false})))
@@ -107,7 +107,7 @@
                      :todos/num-completed 1})]
 
     (when-mocking
-      (util/set-storage! _) => nil
+      (storage/set-storage! _) => nil
 
       ((:action (m/mutate {:state state} 'todo/clear-complete {})))
       (assertions
@@ -121,7 +121,7 @@
   (let [state (atom {})]
 
     (when-mocking
-      (util/set-storage! _) => nil
+      (storage/set-storage! _) => nil
 
       ((:action (m/mutate {:state state} 'todo/filter {:filter :my-filter})))
       (assertions

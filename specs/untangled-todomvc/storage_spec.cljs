@@ -2,25 +2,25 @@
   (:require
     [untangled-spec.core :refer-macros [specification behavior assertions when-mocking]]
     [cljs.test :refer-macros [is]]
-    [untangled-todomvc.storage :as util]
+    [untangled-todomvc.storage :as storage]
     [cognitect.transit :as t]))
 
 (specification "Local storage"
   (let [data {:foo     "bar"
               :baz     1
               'a-thing [:some "other" :stuff]}
-        storage-key util/storage-key]
+        storage-key storage/storage-key]
 
-    (set! util/storage-key "untangled.test")
+    (set! storage/storage-key "untangled.test")
 
     (behavior "Stores and retrieves data"
-      (util/set-storage! data)
-      (is (= data (util/get-storage))))
+      (storage/set-storage! data)
+      (is (= data (storage/get-storage))))
 
     (behavior "Clears data"
-      (util/clear-storage!)
-      (is (nil? (util/get-storage))))
+      (storage/clear-storage!)
+      (is (nil? (storage/get-storage))))
 
-    (util/clear-storage!)
-    (set! util/storage-key storage-key)))
+    (storage/clear-storage!)
+    (set! storage/storage-key storage-key)))
 

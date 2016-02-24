@@ -1,9 +1,9 @@
 (ns untangled-todomvc.mutations
   (:require [untangled.client.mutations :as m]
             [untangled.dom :refer [unique-key]]
-            [untangled-todomvc.storage :as util]))
+            [untangled-todomvc.storage :as storage]))
 
-(defn save-state [state] (util/set-storage! @state))
+(defn save-state [state] (storage/set-storage! @state))
 
 (defmethod m/mutate 'todo/new-item [{:keys [state]} _ {:keys [text]}]
   {:action (fn []
