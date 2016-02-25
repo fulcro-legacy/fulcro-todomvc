@@ -3,18 +3,7 @@
             [untangled-todomvc.ui :as ui]
             [untangled-todomvc.storage :as util]
             untangled-todomvc.mutations
-            [untangled-todomvc.routing :refer [configure-routing!]]
-            [devtools.core :as devtools]
-            [untangled.client.logging :as log]
             [om.next :as om]))
-
-(defonce cljs-build-tools
-  (do (devtools/enable-feature! :sanity-hints)
-      (devtools.core/install!)))
-
-(enable-console-print!)
-
-(log/set-level :debug)
 
 (defonce app (atom (uc/new-untangled-client
                      :initial-state (if-let [storage (util/get-storage)]
@@ -27,7 +16,4 @@
                          {})
                      :started-callback (constantly nil))))
 
-(reset! app (uc/mount @app ui/TodoList "app"))
-
-(configure-routing! (:reconciler @app))
 
