@@ -33,7 +33,16 @@
                                        :parallel-build       true
                                        :recompile-dependents true
                                        :optimizations        :none}}
-
+                       {:id           "support"
+                        :source-paths ["src" "checkouts/untangled-client/src"]
+                        :figwheel     true
+                        :compiler     {:main                 "untangled-todomvc.support-viewer"
+                                       :asset-path           "js/compiled/support"
+                                       :output-to            "resources/public/js/compiled/support.js"
+                                       :output-dir           "resources/public/js/compiled/support"
+                                       :parallel-build       false
+                                       :recompile-dependents true
+                                       :optimizations        :none}}
                        {:id           "production"
                         :source-paths ["dev/client" "src"]
                         :figwheel     true

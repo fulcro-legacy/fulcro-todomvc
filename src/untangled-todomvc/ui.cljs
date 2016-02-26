@@ -1,9 +1,7 @@
 (ns untangled-todomvc.ui
   (:require [om.next :as om :refer-macros [defui]]
             [untangled.client.mutations :as mut]
-            [om.dom :as dom]
-            [untangled-todomvc.routing :as route]
-            [untangled.client.logging :as log]))
+            [om.dom :as dom]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
 (defn is-escape? [evt] (= 27 (.-keyCode evt)))

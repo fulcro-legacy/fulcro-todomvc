@@ -1,0 +1,6 @@
+#support {
+    position:fixed;
+    top: 40px;
+    left: 100px;
+    z-index: 10000;
+}
