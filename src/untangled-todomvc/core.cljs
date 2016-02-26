@@ -1,20 +1,14 @@
 (ns untangled-todomvc.core
   (:require [untangled.client.core :as uc]
             [untangled-todomvc.ui :as ui]
-            [untangled-todomvc.storage :as util]
-            untangled-todomvc.mutations
             [untangled-todomvc.routing :refer [configure-routing!]]
-            [devtools.core :as devtools]
-            [untangled.client.logging :as log]
-            [om.next :as om]))
-
-(defonce cljs-build-tools
-  (do (devtools/enable-feature! :sanity-hints)
-      (devtools.core/install!)))
-
-(enable-console-print!)
-
-(log/set-level :debug)
+            [untangled-todomvc.storage :as util]
+            [goog.events :as events]
+            [secretary.core :as secretary :refer-macros [defroute]]
+            [goog.history.EventType :as EventType]
+            [om.next :as om]
+            [untangled.client.logging :as log])
+  (:import goog.History))
 
 (defonce app (atom (uc/new-untangled-client
                      :initial-state (if-let [storage (util/get-storage)]
@@ -25,9 +19,11 @@
                      #_(if-let [storage (util/get-storage)]
                          (atom (log/debug "Storage" storage))
                          {})
-                     :started-callback (constantly nil))))
+                     :started-callback (fn [app]
+                                         (log/set-level :none)
+                                         (configure-routing! (:reconciler app))
+                                         (let [h (History.)]
+                                           (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
+                                           (doto h (.setEnabled true)))))))
 
-(reset! app (uc/mount @app ui/TodoList "app"))
-
-(configure-routing! (:reconciler @app))
 
