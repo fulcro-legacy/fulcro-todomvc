@@ -20,11 +20,11 @@
   :plugins [[lein-cljsbuild "1.1.2"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
-  :source-paths ["dev/server" "src" "specs" "support"]
+  :source-paths ["dev/server" "src" "specs" "checkouts/untangled-client/src"]
 
   :cljsbuild {:builds [
                        {:id           "dev"
-                        :source-paths ["dev/client" "src"]
+                        :source-paths ["dev/client" "src" "checkouts/untangled-client/src"]
                         :figwheel     true
                         :compiler     {:main                 "cljs.user"
                                        :asset-path           "js/compiled/dev"
@@ -33,16 +33,7 @@
                                        :parallel-build       true
                                        :recompile-dependents true
                                        :optimizations        :none}}
-                       {:id           "support"
-                        :source-paths ["support"]
-                        :figwheel     true
-                        :compiler     {:main                 "support.main"
-                                       :asset-path           "js/support"
-                                       :output-to            "resources/public/js/support.js"
-                                       :output-dir           "resources/public/js/support"
-                                       :parallel-build       true
-                                       :recompile-dependents true
-                                       :optimizations        :none}}
+
                        {:id           "production"
                         :source-paths ["dev/client" "src"]
                         :figwheel     true
@@ -67,7 +58,6 @@
 
   :profiles {
              :dev {
-                   :source-paths ["src" "specs" "dev/server"]
                    :repl-options {
                                   :init-ns          user
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]
