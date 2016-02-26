@@ -1,15 +1,15 @@
 (ns untangled-todomvc.mutations
   (:require [untangled.client.mutations :as m]
             [untangled.dom :refer [unique-key]]
+            [om.next :as om]
             [untangled-todomvc.storage :as util]
             [untangled-todomvc.history :as history]
             [untangled-todomvc.core :as core]))
 
 (defn save-state [state] (util/set-storage! @state))
 
-(defmethod m/mutate 'todo/send-support-request [e k p]
-  {:action (fn []
-             (history/set-storage! (history/serialize-history @core/app)))})
+(defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast]} k p]
+  {:remote (assoc ast :params {:comment "Howdy" :history (history/serialize-history @core/app)})})
 
 (defmethod m/mutate 'todo/new-item [{:keys [state]} _ {:keys [text]}]
   {:action (fn []
