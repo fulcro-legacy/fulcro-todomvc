@@ -7,9 +7,8 @@
 
 (defmethod m/post-mutate :default [{:keys [state]} _ _] (storage/set-storage! @state))
 
-(defmethod m/mutate 'todo/send-support-request [e k p]
-  {:action (fn []
-             (history/set-storage! (history/serialize-history @core/app)))})
+(defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast]} k p]
+  {:remote (assoc ast :params {:comment "Howdy" :history (history/serialize-history @core/app)})})
 
 (defmethod m/mutate 'todo/new-item [{:keys [state]} _ {:keys [text]}]
   {:action (fn []

@@ -20,11 +20,11 @@
   :plugins [[lein-cljsbuild "1.1.2"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
-  :source-paths ["dev/server" "src" "specs"]
+  :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server" "checkouts/untangled-client/src" "checkouts/untangled-server/src"]
 
   :cljsbuild {:builds [
                        {:id           "dev"
-                        :source-paths ["dev/client" "src"]
+                        :source-paths ["dev/client" "src/client" "checkouts/untangled-client/src"]
                         :figwheel     true
                         :compiler     {:main                 "cljs.user"
                                        :asset-path           "js/compiled/dev"
@@ -34,7 +34,7 @@
                                        :recompile-dependents true
                                        :optimizations        :none}}
                        {:id           "support"
-                        :source-paths ["src"]
+                        :source-paths ["src/client" "checkouts/untangled-client/src"]
                         :figwheel     true
                         :compiler     {:main                 "untangled-todomvc.support-viewer"
                                        :asset-path           "js/compiled/support"
@@ -44,7 +44,7 @@
                                        :recompile-dependents true
                                        :optimizations        :none}}
                        {:id           "production"
-                        :source-paths ["dev/client" "src"]
+                        :source-paths ["dev/client" "src/client"]
                         :figwheel     true
                         :compiler     {:main           "untangled-todomvc.main"
                                        :asset-path     "js/compiled/prod"
@@ -53,7 +53,7 @@
                                        :parallel-build false
                                        :optimizations  :advanced}}
                        {:id           "test"
-                        :source-paths ["src" "specs"]
+                        :source-paths ["src/client" "specs/client"]
                         :figwheel     {:on-jsload "untangled-todomvc.test-runner/on-load"}
                         :compiler     {:main                 "untangled-todomvc.test-runner"
                                        :asset-path           "js/compiled/specs"

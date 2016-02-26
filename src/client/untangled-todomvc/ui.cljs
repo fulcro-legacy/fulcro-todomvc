@@ -84,7 +84,7 @@
 
       (dom/div nil
         (dom/div #js {:style #js {:position "fixed" :top "0" :right "0"} :className "support"}
-          (dom/button #js { :onClick #(om/transact! this '[(todo/send-support-request)])} "Send Request"))
+          (dom/button #js { :onClick #(om/transact! this '[(support-viewer/send-support-request)])} "Send Request"))
         (dom/section #js {:className "todoapp"}
 
           (.header this)

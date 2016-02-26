@@ -1,13 +1,20 @@
 (ns user
   (:require
+    [clojure.java.io :as io]
     [clojure.pprint :refer (pprint)]
-    [figwheel-sidecar.repl-api :as ra]))
+    [clojure.stacktrace :refer (print-stack-trace)]
+    [clojure.tools.namespace.repl :refer [disable-reload! refresh clear set-refresh-dirs]]
+    [com.stuartsierra.component :as component]
+    [figwheel-sidecar.repl-api :as ra]
+    [taoensso.timbre :refer [info set-level!]]
+    [todomvc.system :as system]
+    ))
 
 ;;FIGWHEEL
 
 (def figwheel-config
   {:figwheel-options {:css-dirs ["resources/public/css"]}
-   :build-ids        ["dev" "test"]
+   :build-ids        ["dev" "support"]
    :all-builds       (figwheel-sidecar.repl/get-project-cljs-builds)})
 
 (defn start-figwheel
@@ -25,38 +32,31 @@
 
 ;;SERVER
 
-(comment
-  (set-refresh-dirs "dev/server" "src/server" "src/shared" "specs/server" "specs/shared")
+(set-refresh-dirs "dev/server" "src/server" "specs/server")
 
-  (defonce system (atom nil))
+(defonce system (atom nil))
 
-  (set-level! :info)
+(set-level! :info)
 
-  (defn conn [] (-> @system :survey-database :connection))
+(defn init
+  "Create a web server from configurations. Use `start` to start it."
+  []
+  (reset! system (system/make-system)))
 
-  (defn schema [] (dump-schema (d/db (conn))))
+(defn start "Start (an already initialized) web server." [] (swap! system component/start))
+(defn stop "Stop the running web server." []
+  (swap! system component/stop)
+  (reset! system nil))
 
-  (defn get-entity [id] (d/touch (d/entity (d/db (conn)) id)))
+(defn go "Load the overall web server system and start it." []
+  (init)
+  (start))
 
-  (defn init
-    "Create a web server from configurations. Use `start` to start it."
-    []
-    (reset! system (sys/make-system)))
+(defn reset
+  "Stop the web server, refresh all namespace source code from disk, then restart the web server."
+  []
+  (stop)
+  (refresh :after 'user/go))
 
-  (defn start "Start (an already initialized) web server." [] (swap! system component/start))
-  (defn stop "Stop the running web server." []
-    (swap! system component/stop)
-    (reset! system nil))
 
-  (defn go "Load the overall web server system and start it." []
-    (init)
-    (start))
-
-  (defn reset
-    "Stop the web server, refresh all namespace source code from disk, then restart the web server."
-    []
-    (stop)
-    (refresh :after 'user/go))
-
-  )
 
