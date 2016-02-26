@@ -32,7 +32,7 @@
   (render [this]
     (let [{:keys [id text completed editing]} (om/props this)
           edit-text (om/get-state this :edit-text)
-          delete-item (om/get-computed this :onDelete)
+          {:keys [delete-item toggle-complete]} (om/get-computed this)
           submit-edit (fn [evt]
                         (if-let [trimmed-text (trim-text (.. evt -target -value))]
                           (do
@@ -48,7 +48,7 @@
           (dom/input #js {:className "toggle"
                           :type      "checkbox"
                           :checked   completed
-                          :onChange  #(om/transact! this `[(todo/toggle-complete ~{:id id}) :todos/num-completed])})
+                          :onChange  #(toggle-complete id)})
           (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} text)
           (dom/button #js {:className "destroy"
                            :onClick   #(delete-item id)}))
@@ -67,18 +67,20 @@
 (defui ^:once TodoList
   static om/IQuery
   (query [this] [{:todos (om/get-query TodoItem)}
-                 :todos/num-completed
                  :todos/filter])
   Object
   (render [this]
-    (let [{:keys [todos todos/num-completed todos/filter]} (om/props this)
+    (let [{:keys [todos todos/filter]} (om/props this)
           num-todos (count todos)
-          delete-item (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))
+          completed-todos (filterv :completed todos)
+          num-completed (count completed-todos)
           all-completed? (= num-completed num-todos)
           filtered-todos (case filter
                            :active (filterv (comp not :completed) todos)
-                           :completed (filterv :completed todos)
-                           todos)]
+                           :completed completed-todos
+                           todos)
+          delete-item (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))
+          toggle-complete (fn [item-id] (om/transact! this `[(todo/toggle-complete ~{:id item-id})]))]
 
       (dom/div nil
         (dom/div #js {:style #js {:position "fixed" :top "0" :right "0"} :className "support"}
@@ -96,9 +98,11 @@
                                 :onClick   #(om/transact! this `[(todo/toggle-all ~{:all-completed? all-completed?})])})
                 (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
                 (dom/ul #js {:className "todo-list"}
-                  (map #(ui-todo-item (om/computed % {:onDelete delete-item})) filtered-todos)))
+                  (map #(ui-todo-item (om/computed %
+                                        {:delete-item     delete-item
+                                         :toggle-complete toggle-complete})) filtered-todos)))
 
-              (.filter-footer this))))
+              (.filter-footer this num-todos num-completed))))
 
         (.footer-info this))))
 
@@ -116,9 +120,8 @@
                         :autoFocus   true
                         :onKeyDown   add-item}))))
 
-  (filter-footer [this]
-    (let [{:keys [todos todos/num-completed todos/filter]} (om/props this)
-          num-todos (count todos)
+  (filter-footer [this num-todos num-completed]
+    (let [{:keys [todos/filter]} (om/props this)
           num-remaining (- num-todos num-completed)]
 
       (dom/footer #js {:className "footer"}
