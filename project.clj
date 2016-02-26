@@ -20,11 +20,11 @@
   :plugins [[lein-cljsbuild "1.1.2"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
-  :source-paths ["dev/server" "src" "specs" "checkouts/untangled-client/src"]
+  :source-paths ["dev/server" "src" "specs"]
 
   :cljsbuild {:builds [
                        {:id           "dev"
-                        :source-paths ["dev/client" "src" "checkouts/untangled-client/src"]
+                        :source-paths ["dev/client" "src"]
                         :figwheel     true
                         :compiler     {:main                 "cljs.user"
                                        :asset-path           "js/compiled/dev"
@@ -34,7 +34,7 @@
                                        :recompile-dependents true
                                        :optimizations        :none}}
                        {:id           "support"
-                        :source-paths ["src" "checkouts/untangled-client/src"]
+                        :source-paths ["src"]
                         :figwheel     true
                         :compiler     {:main                 "untangled-todomvc.support-viewer"
                                        :asset-path           "js/compiled/support"

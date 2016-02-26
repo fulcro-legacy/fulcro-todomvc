@@ -1,6 +1,14 @@
-#support {
-    position:fixed;
+.history-controls {
+    position: fixed;
+    z-index: 10000;
+}
+
+.controls-left {
     top: 40px;
     left: 100px;
-    z-index: 10000;
+}
+
+.controls-right {
+    top: 40px;
+    right: 100px;
 }

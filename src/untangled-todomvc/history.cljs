@@ -13,6 +13,7 @@
   (let [history-steps (-> untangled-app :reconciler :config :history .-arr)
         history-map (-> untangled-app :reconciler :config :history .-index deref)]
     {:steps   history-steps
-     :history history-map}))
-
+     :history (into {} (map (fn [[k v]]
+                              (js/console.log k "entry metadata: " (meta v))
+                              [k (assoc v :untangled/meta (meta v))]) history-map))}))
 

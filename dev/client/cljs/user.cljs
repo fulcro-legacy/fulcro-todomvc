@@ -3,6 +3,7 @@
     [cljs.pprint :refer [pprint]]
     [devtools.core :as devtools]
     [untangled-todomvc.core :as core]
+    untangled-todomvc.mutations
     [untangled.client.logging :as log]
     [untangled-todomvc.ui :as ui]
     [untangled-todomvc.history :as history]
@@ -34,5 +35,5 @@
 
 
 (comment
-  (history/set-storage! (history/serialize-history @untangled-todomvc.core/app))
+  (untangled-todomvc.history/set-storage! (untangled-todomvc.history/serialize-history @untangled-todomvc.core/app))
   )

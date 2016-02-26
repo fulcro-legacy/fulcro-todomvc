@@ -3,7 +3,6 @@
             [untangled-todomvc.ui :as ui]
             [untangled-todomvc.routing :refer [configure-routing!]]
             [untangled-todomvc.storage :as util]
-            untangled-todomvc.mutations
             [goog.events :as events]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
