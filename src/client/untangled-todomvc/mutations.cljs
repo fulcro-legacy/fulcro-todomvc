@@ -27,9 +27,6 @@
   {:action (fn []
              (letfn [(remove-item [todos] (vec (remove #(= id (second %)) todos)))]
 
-               (when (get-in @state [:todo/by-id id :completed])
-                 (swap! state update :todos/num-completed dec))
-
                (swap! state #(-> %
                               (update :todos remove-item)
                               (update :todo/by-id dissoc id)))))})
@@ -40,26 +37,20 @@
                        (into {} (map (fn [[k v]] [k (assoc v :completed val)]) todos)))]
 
                (if all-completed?
-                 (swap! state #(-> %
-                                (assoc :todos/num-completed 0)
-                                (update :todo/by-id (partial set-completed false))))
-                 (swap! state #(-> %
-                                (assoc :todos/num-completed (count (:todos @state)))
-                                (update :todo/by-id (partial set-completed true)))))))})
+                 (swap! state update :todo/by-id (partial set-completed false))
+                 (swap! state update :todo/by-id (partial set-completed true)))))})
 
 (defmethod m/mutate 'todo/clear-complete [{:keys [state]} _ _]
   {:action (fn []
-             (let [todos (vals (get @state :todo/by-id))
-                   completed-todo-ids (set (keep #(when (:completed %) (:id %)) todos))]
+             (let [todos (get @state :todo/by-id)
+                   completed-todo-ids (set (keep (fn [[id data]] (when (:completed data) id)) todos))]
 
-               (swap! state assoc :todos/num-completed 0)
-               (swap! state (fn [st]
-                              (-> st
-                                (update :todos
-                                  (fn [todos] (vec (remove #(contains? completed-todo-ids (second %)) todos))))
-                                (update :todo/by-id
-                                  (fn [todos] (into {}
-                                                (remove (fn [[k _]] (contains? completed-todo-ids k)) todos)))))))))})
+               (swap! state
+                 (fn [st]
+                   (-> st
+                     (update :todos (fn [todos] (vec (remove #(contains? completed-todo-ids (second %)) todos))))
+                     (update :todo/by-id
+                       (fn [todos] (into {} (remove (fn [[k _]] (contains? completed-todo-ids k)) todos)))))))))})
 
 (defmethod m/mutate 'todo/filter [{:keys [state]} _ {:keys [filter]}]
   {:action (fn [] (swap! state assoc :todos/filter filter))})

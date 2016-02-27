@@ -13,7 +13,8 @@
 ;;FIGWHEEL
 
 (def figwheel-config
-  {:figwheel-options {:css-dirs ["resources/public/css"]}
+  {:figwheel-options {:css-dirs    ["resources/public/css"]
+                      :server-port 2345}
    :build-ids        ["dev" "support"]
    :all-builds       (figwheel-sidecar.repl/get-project-cljs-builds)})
 
