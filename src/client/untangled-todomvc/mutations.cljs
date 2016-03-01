@@ -17,9 +17,13 @@
                             (update :todos (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
                             (assoc-in [:todo/by-id id] {:db/id id :item/label text}))))})
 
-(defmethod m/mutate 'todo/toggle-complete [{:keys [state]} _ {:keys [id]}]
+(defmethod m/mutate 'todo/check [{:keys [state]} _ {:keys [id]}]
   {:remote true
-   :action (fn [] (swap! state (fn [st] (update-in st [:todo/by-id id :completed] #(not %)))))})
+   :action (fn [] (swap! state assoc-in [:todo/by-id id :item/complete] true))})
+
+(defmethod m/mutate 'todo/uncheck [{:keys [state]} _ {:keys [id]}]
+  {:remote true
+   :action (fn [] (swap! state assoc-in [:todo/by-id id :item/complete] false))})
 
 (defmethod m/mutate 'todo/edit [{:keys [state]} _ {:keys [id text]}]
   {:remote true
@@ -66,6 +70,6 @@
                                   (fn [todos] (into {}
                                                 (remove (fn [[k _]] (contains? completed-todo-ids k)) todos)))))))))})
 
-(defmethod m/mutate 'todo/filter [{:keys [state]} _ {:keys [filter]}]
-  {:remote true
-   :action (fn [] (swap! state assoc :todos/filter filter))})
+(defmethod m/mutate 'todo/filter [{:keys [ast state]} _ {:keys [filter]}]
+  {:remote (update ast :params assoc :list (:list @state))
+   :action (fn [] (swap! state assoc-in [:todos :list/filter] filter))})

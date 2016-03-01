@@ -63,8 +63,23 @@
         result @(d/transact connection tx)
         tempid->realid (:tempids result)
         omids->realids (resolve-ids (d/db connection) omid->tempid tempid->realid)]
-    (timbre/info result)
     {:tempids omids->realids}))
+
+(defmethod apimutate 'todo/filter [{:keys [todo-database]} _ {:keys [filter list] :or {filter :list.filter/none list "main"}}]
+  (let [connection (db/get-connection todo-database)
+        list-id (find-list connection list)
+        tx [[:db/add list-id :list/filter filter]]]
+    @(d/transact connection tx)))
+
+(defmethod apimutate 'todo/check [{:keys [todo-database]} _ {:keys [id]}]
+  (let [connection (db/get-connection todo-database)
+        tx [[:db/add id :item/complete true]]]
+    @(d/transact connection tx)))
+
+(defmethod apimutate 'todo/uncheck [{:keys [todo-database]} _ {:keys [id]}]
+  (let [connection (db/get-connection todo-database)
+        tx [[:db/add id :item/complete false]]]
+    @(d/transact connection tx)))
 
 (defn ensure-integer [n]
   (cond

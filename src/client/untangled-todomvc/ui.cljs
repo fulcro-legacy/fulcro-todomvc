@@ -32,7 +32,7 @@
   (render [this]
     (let [{:keys [db/id item/label item/complete ui/editing]} (om/props this)
           edit-text (om/get-state this :edit-text)
-          {:keys [delete-item toggle-complete]} (om/get-computed this)
+          {:keys [delete-item check uncheck]} (om/get-computed this)
           submit-edit (fn [evt]
                         (if-let [trimmed-text (trim-text (.. evt -target -value))]
                           (do
@@ -48,7 +48,7 @@
           (dom/input #js {:className "toggle"
                           :type      "checkbox"
                           :checked   complete
-                          :onChange  #(toggle-complete id)})
+                          :onChange  #(if complete (uncheck id) (check id))})
           (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} label)
           (dom/button #js {:className "destroy"
                            :onClick   #(delete-item id)}))
@@ -75,15 +75,16 @@
     (let [{:keys [list/items list/filter list/title db/id]} (om/props this)
           _ (js/console.log items)
           num-todos (count items)
-          completed-todos (filterv :completed items)
+          completed-todos (filterv :item/complete items)
           num-completed (count completed-todos)
           all-completed? (= num-completed num-todos)
           filtered-todos (case filter
-                           :active (filterv (comp not :completed) items)
-                           :completed completed-todos
+                           :list.filter/active (filterv (comp not :item/complete) items)
+                           :list.filter/completed completed-todos
                            items)
           delete-item (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))
-          toggle-complete (fn [item-id] (om/transact! this `[(todo/toggle-complete ~{:id item-id})]))]
+          check (fn [item-id] (om/transact! this `[(todo/check ~{:id item-id})]))
+          uncheck (fn [item-id] (om/transact! this `[(todo/uncheck ~{:id item-id})]))]
 
       (dom/div nil
         (dom/div #js {:style #js {:position "fixed" :top "0" :right "0"} :className "support"}
@@ -102,8 +103,9 @@
                 (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
                 (dom/ul #js {:className "todo-list"}
                   (map #(ui-todo-item (om/computed %
-                                        {:delete-item     delete-item
-                                         :toggle-complete toggle-complete})) filtered-todos)))
+                                        {:delete-item delete-item
+                                         :check       check
+                                         :uncheck     uncheck})) filtered-todos)))
 
               (.filter-footer this num-todos num-completed))))
 
@@ -133,13 +135,13 @@
           (str (if (= num-remaining 1) " item" " items") " left"))
         (dom/ul #js {:className "filters"}
           (dom/li nil
-            (dom/a #js {:className (when (or (nil? filter) (= :none filter)) "selected")
+            (dom/a #js {:className (when (or (nil? filter) (= :list.filter/none filter)) "selected")
                         :href      "#"} "All"))
           (dom/li nil
-            (dom/a #js {:className (when (= :active filter) "selected")
+            (dom/a #js {:className (when (= :list.filter/active filter) "selected")
                         :href      "#/active"} "Active"))
           (dom/li nil
-            (dom/a #js {:className (when (= :completed filter) "selected")
+            (dom/a #js {:className (when (= :list.filter/completed filter) "selected")
                         :href      "#/completed"} "Completed")))
         (when (pos? num-completed)
           (dom/button #js {:className "clear-completed"
