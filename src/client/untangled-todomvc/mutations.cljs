@@ -14,7 +14,7 @@
   {:remote (assoc ast :params {:id id :text text :list (:list @state)})
    :action (fn []
              (swap! state #(-> %
-                            (update :todos (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
+                            (update-in [:todos :list/items] (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
                             (assoc-in [:todo/by-id id] {:db/id id :item/label text}))))})
 
 (defmethod m/mutate 'todo/check [{:keys [state]} _ {:keys [id]}]
@@ -33,42 +33,28 @@
   {:remote true
    :action (fn []
              (letfn [(remove-item [todos] (vec (remove #(= id (second %)) todos)))]
-
-               (when (get-in @state [:todo/by-id id :completed])
-                 (swap! state update :todos/num-completed dec))
-
                (swap! state #(-> %
-                              (update :todos remove-item)
+                              (update-in [:todos :list/items] remove-item)
                               (update :todo/by-id dissoc id)))))})
 
-(defmethod m/mutate 'todo/toggle-all [{:keys [state]} _ {:keys [all-completed?]}]
-  {:remote true
+(defn- set-completed [val todos]
+  (into {} (map (fn [[k v]] [k (assoc v :item/complete val)]) todos)))
+
+(defmethod m/mutate 'todo/check-all [{:keys [ast state]} _ _]
+  {:remote (assoc ast :params {:id (:list @state)})
+   :action (fn [] (swap! state update :todo/by-id (partial set-completed true)))})
+
+(defmethod m/mutate 'todo/uncheck-all [{:keys [ast state]} _ _]
+  {:remote (assoc ast :params {:id (:list @state)})
+   :action (fn [] (swap! state update :todo/by-id (partial set-completed false)))})
+
+(defmethod m/mutate 'todo/clear-complete [{:keys [ast state]} _ _]
+  {:remote (assoc ast :params {:id (:list @state)})
    :action (fn []
-             (letfn [(set-completed [val todos]
-                       (into {} (map (fn [[k v]] [k (assoc v :completed val)]) todos)))]
-
-               (if all-completed?
-                 (swap! state #(-> %
-                                (assoc :todos/num-completed 0)
-                                (update :todo/by-id (partial set-completed false))))
-                 (swap! state #(-> %
-                                (assoc :todos/num-completed (count (:todos @state)))
-                                (update :todo/by-id (partial set-completed true)))))))})
-
-(defmethod m/mutate 'todo/clear-complete [{:keys [state]} _ _]
-  {:remote true
-   :action (fn []
-             (let [todos (vals (get @state :todo/by-id))
-                   completed-todo-ids (set (keep #(when (:completed %) (:id %)) todos))]
-
-               (swap! state assoc :todos/num-completed 0)
-               (swap! state (fn [st]
-                              (-> st
-                                (update :todos
-                                  (fn [todos] (vec (remove #(contains? completed-todo-ids (second %)) todos))))
-                                (update :todo/by-id
-                                  (fn [todos] (into {}
-                                                (remove (fn [[k _]] (contains? completed-todo-ids k)) todos)))))))))})
+             (swap! state (fn [st]
+                            (-> st
+                              (update-in [:todos :list/items]
+                                (fn [todos] (vec (remove (fn [[_ id]] (get-in [:todo/by-id id :item/complete] false)) todos))))))))})
 
 (defmethod m/mutate 'todo/filter [{:keys [ast state]} _ {:keys [filter]}]
   {:remote (update ast :params assoc :list (:list @state))

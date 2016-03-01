@@ -55,31 +55,56 @@
     (make-list conn list-name)))
 
 (defmethod apimutate 'todo/new-item [{:keys [todo-database]} _ {:keys [id text list]}]
-  (let [connection (db/get-connection todo-database)
-        datomic-id (d/tempid :db.part/user)
-        omid->tempid {id datomic-id}
-        list-id (find-list connection list)
-        tx [[:db/add list-id :list/items datomic-id] {:db/id datomic-id :item/complete false :item/label text}]
-        result @(d/transact connection tx)
-        tempid->realid (:tempids result)
-        omids->realids (resolve-ids (d/db connection) omid->tempid tempid->realid)]
-    {:tempids omids->realids}))
+  {:action #(let [connection (db/get-connection todo-database)
+                  datomic-id (d/tempid :db.part/user)
+                  omid->tempid {id datomic-id}
+                  list-id (find-list connection list)
+                  tx [[:db/add list-id :list/items datomic-id] {:db/id datomic-id :item/complete false :item/label text}]
+                  result @(d/transact connection tx)
+                  tempid->realid (:tempids result)
+                  omids->realids (resolve-ids (d/db connection) omid->tempid tempid->realid)]
+             (timbre/info "New item: " omids->realids)
+             {:tempids omids->realids})})
 
 (defmethod apimutate 'todo/filter [{:keys [todo-database]} _ {:keys [filter list] :or {filter :list.filter/none list "main"}}]
-  (let [connection (db/get-connection todo-database)
-        list-id (find-list connection list)
-        tx [[:db/add list-id :list/filter filter]]]
-    @(d/transact connection tx)))
+  {:action #(let [connection (db/get-connection todo-database)
+                  list-id (find-list connection list)
+                  tx [[:db/add list-id :list/filter filter]]]
+             @(d/transact connection tx)
+             true)})
 
 (defmethod apimutate 'todo/check [{:keys [todo-database]} _ {:keys [id]}]
-  (let [connection (db/get-connection todo-database)
-        tx [[:db/add id :item/complete true]]]
-    @(d/transact connection tx)))
+  {:action #(let [connection (db/get-connection todo-database)
+                  tx [[:db/add id :item/complete true]]]
+             @(d/transact connection tx)
+             true)})
 
 (defmethod apimutate 'todo/uncheck [{:keys [todo-database]} _ {:keys [id]}]
-  (let [connection (db/get-connection todo-database)
-        tx [[:db/add id :item/complete false]]]
-    @(d/transact connection tx)))
+  {:action #(let [connection (db/get-connection todo-database)
+                  tx [[:db/add id :item/complete false]]]
+             @(d/transact connection tx)
+             true)})
+
+(defn- set-checked [connection list-name value]
+  (let [ids (d/q '[:find [?e ...] :in $ ?list-name
+                   :where
+                   [?list-id :list/title ?list-name]
+                   [?list-id :list/items ?e]] (d/db connection) list-name)
+        tx (mapv (fn [id] [:db/add id :item/complete value]) ids)]
+    @(d/transact connection tx)
+    true))
+
+(defmethod apimutate 'todo/check-all [{:keys [todo-database]} _ {:keys [id]}]
+  {:action #(let [connection (db/get-connection todo-database)] (set-checked connection id true))})
+
+(defmethod apimutate 'todo/uncheck-all [{:keys [todo-database]} _ {:keys [id]}]
+  {:action #(let [connection (db/get-connection todo-database)] (set-checked connection id false))})
+
+(defmethod apimutate 'todo/delete-item [{:keys [todo-database]} _ {:keys [id]}]
+  {:action #(let [connection (db/get-connection todo-database)
+                  tx [[:db.fn/retractEntity id]]]
+             @(d/transact connection tx)
+             true)})
 
 (defn ensure-integer [n]
   (cond

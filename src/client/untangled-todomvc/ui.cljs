@@ -99,7 +99,10 @@
                 (dom/input #js {:className "toggle-all"
                                 :type      "checkbox"
                                 :checked   all-completed?
-                                :onClick   #(om/transact! this `[(todo/toggle-all ~{:all-completed? all-completed?})])})
+                                :onClick   (fn [] (if all-completed?
+                                                    (om/transact! this `[(todo/uncheck-all)])
+                                                    (om/transact! this `[(todo/check-all)])))
+                                })
                 (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
                 (dom/ul #js {:className "todo-list"}
                   (map #(ui-todo-item (om/computed %
