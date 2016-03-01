@@ -1,11 +1,8 @@
 (ns untangled-todomvc.mutations
   (:require [untangled.client.mutations :as m]
             [untangled.dom :refer [unique-key]]
-            [untangled-todomvc.storage :as storage]
             [untangled-todomvc.history :as history]
             [untangled-todomvc.core :as core]))
-
-(defmethod m/post-mutate :default [{:keys [state]} _ _] (storage/set-storage! @state))
 
 (defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast]} k p]
   {:remote (assoc ast :params {:comment "Howdy" :history (history/serialize-history @core/app)})})
@@ -57,5 +54,4 @@
                                 (fn [todos] (vec (remove (fn [[_ id]] (get-in @state [:todo/by-id id :item/complete] false)) todos))))))))})
 
 (defmethod m/mutate 'todo/filter [{:keys [ast state]} _ {:keys [filter]}]
-  {:remote (update ast :params assoc :list (:list @state))
-   :action (fn [] (swap! state assoc-in [:todos :list/filter] filter))})
+  {:action (fn [] (swap! state assoc-in [:todos :list/filter] filter))})

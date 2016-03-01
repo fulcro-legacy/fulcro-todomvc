@@ -1,7 +1,6 @@
 (ns untangled-todomvc.core
   (:require [untangled.client.core :as uc]
             [untangled-todomvc.ui :as ui]
-            [untangled-todomvc.storage :as storage]
             [untangled-todomvc.routing :refer [configure-routing!]]
             [goog.events :as events]
             [secretary.core :as secretary :refer-macros [defroute]]
@@ -32,17 +31,12 @@
                                      :todos {:list/title  ""
                                              :list/items  []
                                              :list/filter :none}}
-
-                     ;; Setting an atom in initial state not working as expected for untangled-client
-                     #_(if-let [storage (storage/get-storage)]
-                         (atom (log/debug "Storage" storage))
-                         {})
                      :started-callback (fn [app]
                                          (let [reconciler (:reconciler app)
                                                state (om/app-state reconciler)
                                                list (:list @state)]
                                            (log/set-level :debug)
-                                           (df/load-collection reconciler (om/get-query ui/Root) :params {:list list} :without #{:react-key})
+                                           (df/load-collection reconciler (om/get-query ui/Root) :params {:list list} :without #{:list/filter :react-key})
                                            (configure-routing! reconciler))
                                          (let [h (History.)]
                                            (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))

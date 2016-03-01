@@ -10,6 +10,6 @@
       (devtools.core/install!)))
 
 (defonce support-viewer
-  (viewer/start-untangled-support-viewer "support" ui/TodoList "app"))
+  (viewer/start-untangled-support-viewer "support" ui/Root "app"))
 
 (core/refresh support-viewer)

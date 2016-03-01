@@ -13,13 +13,13 @@
 (defonce requests (atom {}))
 
 (defmethod apimutate 'support-viewer/send-support-request [e k p]
-  (let [_ (swap! last-id inc)
-        id @last-id]
-    {:action
-     (fn []
+  {:action
+   (fn []
+     (let [_ (swap! last-id inc)
+           id @last-id]
        (timbre/info "New support request " id)
        (swap! requests assoc id p)
-       id)}))
+       id))})
 
 (defn resolve-ids [new-db omids->tempids tempids->realids]
   (reduce
@@ -42,7 +42,7 @@
 
 (defn make-list [connection list-name]
   (let [id (d/tempid :db.part/user)
-        tx [{:db/id id :list/title list-name :list/filter :list.filter/none}]
+        tx [{:db/id id :list/title list-name}]
         idmap (:tempids @(d/transact connection tx))
         real-id (d/resolve-tempid (d/db connection) idmap id)]
     real-id))
@@ -63,15 +63,7 @@
                   result @(d/transact connection tx)
                   tempid->realid (:tempids result)
                   omids->realids (resolve-ids (d/db connection) omid->tempid tempid->realid)]
-             (timbre/info "New item: " omids->realids)
              {:tempids omids->realids})})
-
-(defmethod apimutate 'todo/filter [{:keys [todo-database]} _ {:keys [filter list] :or {filter :list.filter/none list "main"}}]
-  {:action #(let [connection (db/get-connection todo-database)
-                  list-id (find-list connection list)
-                  tx [[:db/add list-id :list/filter filter]]]
-             @(d/transact connection tx)
-             true)})
 
 (defmethod apimutate 'todo/check [{:keys [todo-database]} _ {:keys [id]}]
   {:action #(let [connection (db/get-connection todo-database)
@@ -125,14 +117,12 @@
 (defn read-list [connection query nm]
   (let [list-id (find-list connection nm)
         db (d/db connection)
-        rv (replace-ref-types db #{:list/filter} (d/pull db query list-id))]
-    (timbre/info list-id query rv)
+        rv (d/pull db query list-id)]
     rv))
 
 (defn api-read [{:keys [todo-database query] :as env} k {:keys [list] :as params}]
   (let [connection (db/get-connection todo-database)]
     (case k
-      :todos/filter :none
       :todos {:value (read-list connection query list)}
       :support-request (let [id (:id params)]
                          (timbre/info "Sending history for " id)

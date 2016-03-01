@@ -7,7 +7,6 @@
      [(s/schema list
         (s/fields
           [title :string :unique-identity "The title of the todo list."]
-          [filter :enum [:none :completed :active]]
           [items :ref :many :component "Items on the list."]))
 
       (s/schema item
