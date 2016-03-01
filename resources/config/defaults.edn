@@ -1,1 +1,7 @@
-{:port 3000}
+{
+ :datomic {:dbs {:todo {:url          "datomic:mem://todo"
+                        :schema       "todomvc.migrations"
+                        :auto-migrate true
+                        :auto-drop    true
+                        }}}
+ :port    3000}

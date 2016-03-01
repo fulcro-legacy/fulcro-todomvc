@@ -9,6 +9,8 @@
                  [org.omcljs/om "1.0.0-alpha31-SNAPSHOT"]
                  [navis/untangled-client "0.4.4-SNAPSHOT"]
                  [navis/untangled-server "0.4.4-SNAPSHOT" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
+                 [navis/untangled-datomic "0.4.2"]
+                 [com.datomic/datomic-free "0.9.5350"]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
                  [joda-time "2.8.2"]
                  [clj-time "0.11.0"]

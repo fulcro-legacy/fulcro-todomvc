@@ -14,9 +14,9 @@
 
 (defui ^:once TodoItem
   static om/IQuery
-  (query [_] [:id :text :completed :editing])
+  (query [_] [:db/id :item/label :item/complete :ui/editing])
   static om/Ident
-  (ident [_ props] [:todo/by-id (:id props)])
+  (ident [_ props] [:todo/by-id (:db/id props)])
   Object
   (initLocalState [this]
     {:edit-text (:text (om/props this))})
@@ -30,7 +30,7 @@
         (.setSelectionRange input-field input-field-length input-field-length))))
 
   (render [this]
-    (let [{:keys [id text completed editing]} (om/props this)
+    (let [{:keys [db/id item/label item/complete ui/editing]} (om/props this)
           edit-text (om/get-state this :edit-text)
           {:keys [delete-item toggle-complete]} (om/get-computed this)
           submit-edit (fn [evt]
@@ -42,14 +42,14 @@
                           (delete-item id)))]
 
       (dom/li #js {:className (cond-> ""
-                                completed (str "completed")
+                                complete (str "completed")
                                 editing (str " editing"))}
         (dom/div #js {:className "view"}
           (dom/input #js {:className "toggle"
                           :type      "checkbox"
-                          :checked   completed
+                          :checked   complete
                           :onChange  #(toggle-complete id)})
-          (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} text)
+          (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} label)
           (dom/button #js {:className "destroy"
                            :onClick   #(delete-item id)}))
         (dom/input #js {:className "edit"
@@ -58,36 +58,39 @@
                         :onChange  #(om/update-state! this assoc :edit-text (.. % -target -value))
                         :onKeyDown #(cond
                                      (is-enter? %) (submit-edit %)
-                                     (is-escape? %) (do (om/update-state! this assoc :edit-text text)
+                                     (is-escape? %) (do (om/update-state! this assoc :edit-text label)
                                                         (mut/toggle! this :editing)))
                         :onBlur    #(when editing (submit-edit %))})))))
 
-(def ui-todo-item (om/factory TodoItem {:keyfn :id}))
+(def ui-todo-item (om/factory TodoItem {:keyfn :db/id}))
 
 (defui ^:once TodoList
   static om/IQuery
-  (query [this] [{:todos (om/get-query TodoItem)}
-                 :todos/filter])
+  (query [this] [:db/id
+                 {:list/items (om/get-query TodoItem)}
+                 :list/title
+                 :list/filter])
   Object
   (render [this]
-    (let [{:keys [todos todos/filter]} (om/props this)
-          num-todos (count todos)
-          completed-todos (filterv :completed todos)
+    (let [{:keys [list/items list/filter list/title db/id]} (om/props this)
+          _ (js/console.log items)
+          num-todos (count items)
+          completed-todos (filterv :completed items)
           num-completed (count completed-todos)
           all-completed? (= num-completed num-todos)
           filtered-todos (case filter
-                           :active (filterv (comp not :completed) todos)
+                           :active (filterv (comp not :completed) items)
                            :completed completed-todos
-                           todos)
+                           items)
           delete-item (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))
           toggle-complete (fn [item-id] (om/transact! this `[(todo/toggle-complete ~{:id item-id})]))]
 
       (dom/div nil
         (dom/div #js {:style #js {:position "fixed" :top "0" :right "0"} :className "support"}
-          (dom/button #js { :onClick #(om/transact! this '[(support-viewer/send-support-request)])} "Send Request"))
+          (dom/button #js {:onClick #(om/transact! this '[(support-viewer/send-support-request)])} "Send Request"))
         (dom/section #js {:className "todoapp"}
 
-          (.header this)
+          (.header this title)
 
           (when (pos? num-todos)
             (dom/div nil
@@ -106,22 +109,22 @@
 
         (.footer-info this))))
 
-  (header [this]
+  (header [this title]
     (letfn [(add-item [evt]
               (when (is-enter? evt)
                 (when-let [trimmed-text (trim-text (.. evt -target -value))]
-                  (om/transact! this `[(todo/new-item ~{:text trimmed-text})])
+                  (om/transact! this `[(todo/new-item ~{:id (om/tempid) :text trimmed-text})])
                   (set! (.. evt -target -value) ""))))]
 
       (dom/header #js {:className "header"}
-        (dom/h1 nil "todos")
+        (dom/h1 nil title)
         (dom/input #js {:className   "new-todo"
                         :placeholder "What needs to be done?"
                         :autoFocus   true
                         :onKeyDown   add-item}))))
 
   (filter-footer [this num-todos num-completed]
-    (let [{:keys [todos/filter]} (om/props this)
+    (let [{:keys [list/filter]} (om/props this)
           num-remaining (- num-todos num-completed)]
 
       (dom/footer #js {:className "footer"}
@@ -151,3 +154,14 @@
       (dom/p nil "Part of "
         (dom/a #js {:href   "http://todomvc.com"
                     :target "_blank"} "TodoMVC")))))
+
+(def ui-todo-list (om/factory TodoList))
+
+(defui ^:once Root
+  static om/IQuery
+  (query [this] [:react-key {:todos (om/get-query TodoList)}])
+  Object
+  (render [this]
+    (let [{:keys [react-key todos]} (om/props this)]
+      (dom/div #js {:key (or react-key "ROOT")}
+        (ui-todo-list todos)))))
