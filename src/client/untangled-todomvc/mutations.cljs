@@ -54,7 +54,7 @@
              (swap! state (fn [st]
                             (-> st
                               (update-in [:todos :list/items]
-                                (fn [todos] (vec (remove (fn [[_ id]] (get-in [:todo/by-id id :item/complete] false)) todos))))))))})
+                                (fn [todos] (vec (remove (fn [[_ id]] (get-in @state [:todo/by-id id :item/complete] false)) todos))))))))})
 
 (defmethod m/mutate 'todo/filter [{:keys [ast state]} _ {:keys [filter]}]
   {:remote (update ast :params assoc :list (:list @state))

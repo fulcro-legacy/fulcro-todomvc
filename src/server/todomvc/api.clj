@@ -106,6 +106,17 @@
              @(d/transact connection tx)
              true)})
 
+(defmethod apimutate 'todo/clear-complete [{:keys [todo-database]} _ {:keys [id]}]
+  {:action #(let [connection (db/get-connection todo-database)
+                  ids (d/q '[:find [?e ...] :in $ ?list-name
+                             :where
+                             [?list-id :list/title ?list-name]
+                             [?list-id :list/items ?e]
+                             [?e :item/complete true]] (d/db connection) id)
+                  tx (mapv (fn [id] [:db.fn/retractEntity id]) ids)]
+             @(d/transact connection tx)
+             true)})
+
 (defn ensure-integer [n]
   (cond
     (string? n) (Integer/parseInt n)
