@@ -80,8 +80,6 @@
                    }
              }
 
-  :repositories [
-                 ["releases" "https://artifacts.buehner-fry.com/artifactory/navis-maven-release"]
+  :repositories [["releases" "https://artifacts.buehner-fry.com/artifactory/navis-maven-release"]
                  ["snapshot1" "https://artifacts.buehner-fry.com/artifactory/navis-maven-snapshot"]
-                 ["snapshot2" "https://artifacts.buehner-fry.com/artifactory/internal-snapshots"]
-                 ])
+                 ["snapshot2" "https://artifacts.buehner-fry.com/artifactory/internal-snapshots"]])
