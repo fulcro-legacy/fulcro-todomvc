@@ -26,20 +26,22 @@
   ([url param-name]
    (get (uri-params url) param-name)))
 
+(defn on-app-started [app]
+  (let [reconciler (:reconciler app)
+        state (om/app-state reconciler)
+        list (:list @state)]
+    (log/set-level :debug)
+    (df/load-collection reconciler (om/get-query ui/Root) :params {:list list} :without #{:list/filter :react-key})
+    (configure-routing! reconciler))
+  (let [h (History.)]
+    (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
+    (doto h (.setEnabled true))))
+
 (defonce app (atom (uc/new-untangled-client
                      :initial-state {:list  (or (get-url-param "list") "main")
                                      :todos {:list/title  ""
                                              :list/items  []
                                              :list/filter :none}}
-                     :started-callback (fn [app]
-                                         (let [reconciler (:reconciler app)
-                                               state (om/app-state reconciler)
-                                               list (:list @state)]
-                                           (log/set-level :debug)
-                                           (df/load-collection reconciler (om/get-query ui/Root) :params {:list list} :without #{:list/filter :react-key})
-                                           (configure-routing! reconciler))
-                                         (let [h (History.)]
-                                           (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
-                                           (doto h (.setEnabled true)))))))
+                     :started-callback on-app-started)))
 
 

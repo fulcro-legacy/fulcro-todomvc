@@ -77,6 +77,12 @@
              @(d/transact connection tx)
              true)})
 
+(defmethod apimutate 'todo/edit [{:keys [todo-database]} _ {:keys [id text]}]
+  {:action #(let [connection (db/get-connection todo-database)
+                  tx [[:db/add id :item/label text]]]
+             @(d/transact connection tx)
+             true)})
+
 (defn- set-checked [connection list-name value]
   (let [ids (d/q '[:find [?e ...] :in $ ?list-name
                    :where

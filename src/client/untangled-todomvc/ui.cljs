@@ -38,7 +38,7 @@
                           (do
                             (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
                             (om/update-state! this assoc :edit-text trimmed-text)
-                            (mut/toggle! this :editing))
+                            (mut/toggle! this :ui/editing))
                           (delete-item id)))]
 
       (dom/li #js {:className (cond-> ""
@@ -49,7 +49,9 @@
                           :type      "checkbox"
                           :checked   complete
                           :onChange  #(if complete (uncheck id) (check id))})
-          (dom/label #js {:onDoubleClick #(mut/toggle! this :editing)} label)
+          (dom/label #js {:onDoubleClick (fn []
+                                           (mut/toggle! this :ui/editing)
+                                           (om/update-state! this assoc :edit-text label))} label)
           (dom/button #js {:className "destroy"
                            :onClick   #(delete-item id)}))
         (dom/input #js {:className "edit"
@@ -59,7 +61,7 @@
                         :onKeyDown #(cond
                                      (is-enter? %) (submit-edit %)
                                      (is-escape? %) (do (om/update-state! this assoc :edit-text label)
-                                                        (mut/toggle! this :editing)))
+                                                        (mut/toggle! this :ui/editing)))
                         :onBlur    #(when editing (submit-edit %))})))))
 
 (def ui-todo-item (om/factory TodoItem {:keyfn :db/id}))

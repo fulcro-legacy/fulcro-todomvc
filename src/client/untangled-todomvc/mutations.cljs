@@ -24,7 +24,7 @@
 
 (defmethod m/mutate 'todo/edit [{:keys [state]} _ {:keys [id text]}]
   {:remote true
-   :action (fn [] (swap! state assoc-in [:todo/by-id id :text] text))})
+   :action (fn [] (swap! state assoc-in [:todo/by-id id :item/label] text))})
 
 (defmethod m/mutate 'todo/delete-item [{:keys [state]} _ {:keys [id]}]
   {:remote true
