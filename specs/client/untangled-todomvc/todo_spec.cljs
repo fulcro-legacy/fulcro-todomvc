@@ -35,13 +35,13 @@
         (get-in @to-active-state [:todo/by-id 1 :item/complete]) => false))))
 
 (specification "Editing a todo"
-  (let [state (atom {:todos      [[:todo/by-id 1]]
-                     :todo/by-id {1 {:id 1 :text "Hello"}}})]
+  (let [state (atom {:todos      {:list/items [[:todo/by-id 1]]}
+                     :todo/by-id {1 {:db/id 1 :item/label "Hello"}}})]
 
     ((:action (m/mutate {:state state} 'todo/edit {:id 1 :text "Goodbye"})))
     (assertions
       "changes the text for that todo in the app state."
-      (get-in @state [:todo/by-id 1 :text]) => "Goodbye")))
+      (get-in @state [:todo/by-id 1 :item/label]) => "Goodbye")))
 
 (specification "Toggling the completion of all todos"
   (let [to-complete-state (atom {:todos      {:list/items [[:todo/by-id 1] [:todo/by-id 2]]}
