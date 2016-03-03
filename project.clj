@@ -6,18 +6,18 @@
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
-                 [org.omcljs/om "1.0.0-alpha31-SNAPSHOT"]
-                 [navis/untangled-client "0.4.4-SNAPSHOT"]
-                 [navis/untangled-server "0.4.4-SNAPSHOT" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
-                 [navis/untangled-datomic "0.4.2"]
+                 [org.omcljs/om "1.0.0-alpha30"]
+                 [navis/untangled-client "0.4.4"]
+                 [navis/untangled-server "0.4.5" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
+                 [navis/untangled-datomic "0.4.4"]
                  [com.datomic/datomic-free "0.9.5350"]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
                  [joda-time "2.8.2"]
                  [clj-time "0.11.0"]
                  [commons-codec "1.10"]
-                 [com.taoensso/timbre "4.2.1"]
-                 [com.stuartsierra/component "0.3.0"]
-                 [untangled-spec "0.3.3" :scope "test"]]
+                 [com.taoensso/timbre "4.3.1"]
+                 [com.stuartsierra/component "0.3.1"]
+                 [navis/untangled-spec "0.3.5" :scope "test"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]]
 
@@ -78,12 +78,4 @@
                    :dependencies [[figwheel-sidecar "0.5.0-5" :exclusions [clj-time ring/ring-core commons-fileupload]]
                                   [binaryage/devtools "0.5.2" :exclusions [environ]]
                                   [com.cemerick/piggieback "0.2.1"]
-                                  [org.clojure/tools.nrepl "0.2.12"]]
-                   }
-             }
-
-  :repositories [
-                 ["releases" "https://artifacts.buehner-fry.com/artifactory/navis-maven-release"]
-                 ["snapshot1" "https://artifacts.buehner-fry.com/artifactory/navis-maven-snapshot"]
-                 ["snapshot2" "https://artifacts.buehner-fry.com/artifactory/internal-snapshots"]
-                 ])
+                                  [org.clojure/tools.nrepl "0.2.12"]]}})
