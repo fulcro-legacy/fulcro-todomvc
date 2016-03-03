@@ -22,9 +22,8 @@
 (specification "Toggling a todo's completion"
   (let [to-complete-state (atom {:todos      [[:todo/by-id 1]]
                                  :todo/by-id {1 {:id 1 :text "Hello"}}})
-        to-active-state (atom {:todos               [[:todo/by-id 1]]
-                               :todo/by-id          {1 {:id 1 :text "Hello" :completed true}}
-                               :todos/num-completed 1})]
+        to-active-state (atom {:todos      [[:todo/by-id 1]]
+                               :todo/by-id {1 {:id 1 :text "Hello" :completed true}}})]
 
     (behavior "when toggling to complete"
       ((:action (m/mutate {:state to-complete-state} 'todo/toggle-complete {:id 1})))
@@ -48,23 +47,18 @@
       (get-in @state [:todo/by-id 1 :text]) => "Goodbye")))
 
 (specification "Toggling the completion of all todos"
-  (let [to-complete-state (atom {:todos               [[:todo/by-id 1] [:todo/by-id 2]]
-                                 :todo/by-id          {1 {:id 1 :text "Hello"}
-                                                       2 {:id 2 :text "Bye" :completed true}}
-                                 :todos/num-completed 1})
+  (let [to-complete-state (atom {:todos      [[:todo/by-id 1] [:todo/by-id 2]]
+                                 :todo/by-id {1 {:id 1 :text "Hello"}
+                                              2 {:id 2 :text "Bye" :completed true}}})
 
-        to-active-state (atom {:todos               [[:todo/by-id 1] [:todo/by-id 2]]
-                               :todo/by-id          {1 {:id 1 :text "Hello" :completed true}
-                                                     2 {:id 2 :text "Bye" :completed true}}
-                               :todos/num-completed 2})]
+        to-active-state (atom {:todos      [[:todo/by-id 1] [:todo/by-id 2]]
+                               :todo/by-id {1 {:id 1 :text "Hello" :completed true}
+                                            2 {:id 2 :text "Bye" :completed true}}})]
 
     (behavior "when toggling to complete status"
       ((:action (m/mutate {:state to-complete-state} 'todo/toggle-all {:all-completed? false})))
 
       (assertions
-        "sets the number of completed todos to the number of todos."
-        (:todos/num-completed @to-complete-state) => (count (:todos @to-complete-state))
-
         "marks all todo items as complete."
         (vals (:todo/by-id @to-complete-state)) =fn=>
         (fn [todos]
@@ -76,8 +70,6 @@
       ((:action (m/mutate {:state to-active-state} 'todo/toggle-all {:all-completed? true})))
 
       (assertions
-        "sets the number of completed todos to 0."
-        (:todos/num-completed @to-active-state) => 0
         "marks all todo items as active."
         (vals (:todo/by-id @to-active-state)) =fn=>
         (fn [todos]
@@ -87,18 +79,15 @@
                 (fn [acc todo] (or acc (:completed todo))) false todos))))))))
 
 (specification "Clear completed todos"
-  (let [state (atom {:todos               [[:todo/by-id 1] [:todo/by-id 2]]
-                     :todo/by-id          {1 {:id 1 :text "Hello"}
-                                           2 {:id 2 :text "Bye" :completed true}}
-                     :todos/num-completed 1})]
+  (let [state (atom {:todos      [[:todo/by-id 1] [:todo/by-id 2]]
+                     :todo/by-id {1 {:id 1 :text "Hello"}
+                                  2 {:id 2 :text "Bye" :completed true}}})]
 
     ((:action (m/mutate {:state state} 'todo/clear-complete {})))
     (assertions
       "removes completed todos from app state."
       (:todos @state) => [[:todo/by-id 1]]
-      (:todo/by-id @state) => {1 {:id 1 :text "Hello"}}
-      "sets the count of completed items to 0."
-      (:todos/num-completed @state) => 0)))
+      (:todo/by-id @state) => {1 {:id 1 :text "Hello"}})))
 
 (specification "Can change the filter"
   (let [state (atom {})]

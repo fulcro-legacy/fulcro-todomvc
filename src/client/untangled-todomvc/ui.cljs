@@ -1,7 +1,9 @@
 (ns untangled-todomvc.ui
   (:require [om.next :as om :refer-macros [defui]]
+            [untangled.i18n :refer-macros [tr]]
             [untangled.client.mutations :as mut]
-            [om.dom :as dom]))
+            [om.dom :as dom]
+            translations.es))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
 (defn is-escape? [evt] (= 27 (.-keyCode evt)))
@@ -83,8 +85,12 @@
           toggle-complete (fn [item-id] (om/transact! this `[(todo/toggle-complete ~{:id item-id})]))]
 
       (dom/div nil
+        (dom/div #js {:style #js {:position "fixed" :top "0" :left "0"}}
+          (dom/select #js {:onChange #(om/transact! this `[(app/change-locale {:lang ~(.. % -target -value)})])}
+            (dom/option #js {:value "en"} "English")
+            (dom/option #js {:value "es"} "Español")))
         (dom/div #js {:style #js {:position "fixed" :top "0" :right "0"} :className "support"}
-          (dom/button #js { :onClick #(om/transact! this '[(support-viewer/send-support-request)])} "Send Request"))
+          (dom/button #js {:onClick #(om/transact! this '[(support-viewer/send-support-request)])} (tr "Send Request")))
         (dom/section #js {:className "todoapp"}
 
           (.header this)
@@ -114,9 +120,9 @@
                   (set! (.. evt -target -value) ""))))]
 
       (dom/header #js {:className "header"}
-        (dom/h1 nil "todos")
+        (dom/h1 nil (tr "todos"))
         (dom/input #js {:className   "new-todo"
-                        :placeholder "What needs to be done?"
+                        :placeholder (tr "What needs to be done?")
                         :autoFocus   true
                         :onKeyDown   add-item}))))
 
@@ -127,27 +133,27 @@
       (dom/footer #js {:className "footer"}
         (dom/span #js {:className "todo-count"}
           (dom/strong nil num-remaining)
-          (str (if (= num-remaining 1) " item" " items") " left"))
+          (str " " (if (= num-remaining 1) (tr "item") (tr "items")) " " (tr "left")))
         (dom/ul #js {:className "filters"}
           (dom/li nil
             (dom/a #js {:className (when (or (nil? filter) (= :none filter)) "selected")
-                        :href      "#"} "All"))
+                        :href      "#"} (tr "All")))
           (dom/li nil
             (dom/a #js {:className (when (= :active filter) "selected")
-                        :href      "#/active"} "Active"))
+                        :href      "#/active"} (tr "Active")))
           (dom/li nil
             (dom/a #js {:className (when (= :completed filter) "selected")
-                        :href      "#/completed"} "Completed")))
+                        :href      "#/completed"} (tr "Completed"))))
         (when (pos? num-completed)
           (dom/button #js {:className "clear-completed"
-                           :onClick   #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
+                           :onClick   #(om/transact! this `[(todo/clear-complete)])} (tr "Clear Completed"))))))
 
   (footer-info [this]
     (dom/footer #js {:className "info"}
-      (dom/p nil "Double-click to edit a todo")
-      (dom/p nil "Created by "
+      (dom/p nil (tr "Double-click to edit a todo"))
+      (dom/p nil (tr "Created by ")
         (dom/a #js {:href   "http://www.thenavisway.com"
                     :target "_blank"} "NAVIS"))
-      (dom/p nil "Part of "
+      (dom/p nil (tr "Part of ")
         (dom/a #js {:href   "http://todomvc.com"
                     :target "_blank"} "TodoMVC")))))

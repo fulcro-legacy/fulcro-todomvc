@@ -20,11 +20,11 @@
   :plugins [[lein-cljsbuild "1.1.2"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
-  :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server" "checkouts/untangled-client/src" "checkouts/untangled-server/src"]
+  :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server"]
 
   :cljsbuild {:builds [
                        {:id           "dev"
-                        :source-paths ["dev/client" "src/client" "checkouts/untangled-client/src"]
+                        :source-paths ["dev/client" "src/client"]
                         :figwheel     true
                         :compiler     {:main                 "cljs.user"
                                        :asset-path           "js/compiled/dev"
@@ -34,7 +34,7 @@
                                        :recompile-dependents true
                                        :optimizations        :none}}
                        {:id           "support"
-                        :source-paths ["src/client" "checkouts/untangled-client/src"]
+                        :source-paths ["src/client"]
                         :figwheel     true
                         :compiler     {:main                 "untangled-todomvc.support-viewer"
                                        :asset-path           "js/compiled/support"
@@ -80,8 +80,6 @@
                    }
              }
 
-  :repositories [
-                 ["releases" "https://artifacts.buehner-fry.com/artifactory/navis-maven-release"]
+  :repositories [["releases" "https://artifacts.buehner-fry.com/artifactory/navis-maven-release"]
                  ["snapshot1" "https://artifacts.buehner-fry.com/artifactory/navis-maven-snapshot"]
-                 ["snapshot2" "https://artifacts.buehner-fry.com/artifactory/internal-snapshots"]
-                 ])
+                 ["snapshot2" "https://artifacts.buehner-fry.com/artifactory/internal-snapshots"]])

@@ -3,8 +3,7 @@
     [untangled.server.core :as core]
     [todomvc.api :as api]
     [om.next.server :as om]
-    [taoensso.timbre :as timbre]
-    [untangled.server.core :as c]))
+    [taoensso.timbre :as timbre]))
 
 ;; IMPORTANT: Remember to load all multi-method namespaces to ensure all of the methods are defined in your parser!
 
@@ -15,7 +14,7 @@
   (api/apimutate env k params))
 
 (defn make-system []
-  (let [config-path "/usr/local/etc/todomvc.edn"]
+  (let [config-path "config/defaults.edn"]
     (core/make-untangled-server
       :config-path config-path
       :parser (om/parser {:read api/api-read :mutate logging-mutate})
