@@ -15,7 +15,6 @@
                                       (om/db->tree (om/get-query ui/TodoList) storage storage)
                                       {:todos/filter :none})
                      :started-callback (fn [app]
-                                         (log/set-level :none)
                                          (configure-routing! (:reconciler app))
                                          (let [h (History.)]
                                            (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))

@@ -1,8 +1,8 @@
 (defproject untangled-todomvc "0.3.0-SNAPSHOT"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
-  :license {:name "NAVIS"
-            :url  "http://www.thenavisway.com"}
+  :license {:name "MIT"
+            :url  "https://opensource.org/licenses/MIT"}
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
@@ -35,13 +35,14 @@
                                                    :output-to            "resources/public/js/compiled/todomvc-specs.js"
                                                    :output-dir           "resources/public/js/compiled/specs"}}
                        :production {:source-paths ["src/client"]
-                                    :compiler     {:verbose       true
-                                                   :output-to     "resources/public/js/compiled/untangled-todomvc.min.js"
-                                                   :output-dir    "resources/public/js/compiled"
-                                                   :pretty-print  false
-                                                   :externs       ["externs.js"]
+                                    :compiler     {:verbose         true
+                                                   :output-to       "resources/public/js/compiled/untangled-todomvc.min.js"
+                                                   :output-dir      "resources/public/js/compiled"
+                                                   :pretty-print    false
                                                    :closure-defines {goog.DEBUG false}
-                                                   :optimizations :advanced}}}}
+                                                   :source-map      "resources/public/js/compiled/untangled-todomvc.min.js.map"
+                                                   :elide-asserts   true
+                                                   :optimizations   :advanced}}}}
 
   :figwheel {:css-dirs    ["resources/public/css"]
              :server-port 2345}
