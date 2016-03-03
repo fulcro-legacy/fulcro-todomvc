@@ -14,11 +14,6 @@
                      :initial-state (if-let [storage (storage/get-storage)]
                                       (om/db->tree (om/get-query ui/TodoList) storage storage)
                                       {:todos/filter :none})
-
-                     ;; Setting an atom in initial state not working as expected for untangled-client
-                     #_(if-let [storage (storage/get-storage)]
-                         (atom (log/debug "Storage" storage))
-                         {})
                      :started-callback (fn [app]
                                          (log/set-level :none)
                                          (configure-routing! (:reconciler app))
