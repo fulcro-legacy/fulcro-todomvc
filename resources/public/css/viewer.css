@@ -1,6 +1,8 @@
 .history-controls {
     position: fixed;
     z-index: 10000;
+    background: rgba(200,200,200,0.8);
+    padding: 10px;
 }
 
 .controls-left {
@@ -11,4 +13,19 @@
 .controls-right {
     top: 40px;
     right: 100px;
+}
+
+button {
+  padding: 5px;
+  border: 2px solid black;
+}
+
+.frame {
+display: block;
+text-align: center;
+}
+
+.timestamp {
+display: block;
+text-align: center;
 }

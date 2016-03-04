@@ -372,3 +372,15 @@ html .clear-completed:active {
 		bottom: 10px;
 	}
 }
+
+.locale-selector {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+}
+
+.support-request {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}

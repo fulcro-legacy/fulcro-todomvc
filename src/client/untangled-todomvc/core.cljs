@@ -6,6 +6,8 @@
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
             [om.next :as om]
+            untangled-todomvc.i18n.locales
+            untangled-todomvc.i18n.default-locale
             [untangled.client.logging :as log]
             [untangled.client.data-fetch :as df])
   (:import goog.History))
@@ -30,7 +32,8 @@
   (let [reconciler (:reconciler app)
         state (om/app-state reconciler)
         list (:list @state)]
-    (df/load-collection reconciler (om/get-query ui/Root) :params {:list list} :without #{:list/filter :react-key})
+    (df/load-collection reconciler (om/get-query ui/Root) :params {:list list}
+                        :without #{:list/filter :ui/support-visible :react-key :app/locale})
     (configure-routing! reconciler))
   (let [h (History.)]
     (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
