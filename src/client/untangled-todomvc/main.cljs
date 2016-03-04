@@ -4,4 +4,4 @@
             untangled-todomvc.mutations
             [untangled.client.core :as uc]))
 
-(reset! core/app (uc/mount @core/app ui/TodoList "app"))
+(defonce mounted-app (reset! core/app (uc/mount @core/app ui/Root "app")))
