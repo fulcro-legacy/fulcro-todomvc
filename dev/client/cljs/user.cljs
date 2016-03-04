@@ -18,11 +18,7 @@
       (devtools.core/install!)))
 
 (log/set-level :debug)
-
 (reset! core/app (uc/mount @core/app ui/Root "app"))
-
-(defonce routing
-  (configure-routing! (:reconciler @core/app)))
 
 (defn log-app-state
   "Helper for logging the app-state, pass in top-level keywords from the app-state and it will print only those

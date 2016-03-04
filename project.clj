@@ -19,48 +19,65 @@
                  [com.stuartsierra/component "0.3.1"]
                  [navis/untangled-spec "0.3.5" :scope "test"]]
 
-  :plugins [[lein-cljsbuild "1.1.2"]]
+  :plugins [[lein-cljsbuild "1.1.2"]
+            [navis/untangled-lein-i18n "0.1.2"]]
 
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  :untangled-i18n {:default-locale        "en-US"
+                   :translation-namespace untangled-todomvc.i18n
+                   :source-folder         "src/client"
+                   :target-build          "i18n"
+                   }
+
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "i18n/out"]
   :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server"]
 
-  :cljsbuild {:builds {:dev        {:source-paths ["dev/client" "src/client"]
-                                    :figwheel     true
-                                    :compiler     {:main                 "cljs.user"
-                                                   :asset-path           "js/compiled/dev"
-                                                   :output-to            "resources/public/js/compiled/untangled-todomvc.js"
-                                                   :output-dir           "resources/public/js/compiled/dev"
-                                                   :parallel-build       true
-                                                   :recompile-dependents true
-                                                   :optimizations        :none}}
-                       :test       {
-                                    :source-paths ["src/client" "specs/client"]
-                                    :figwheel     {:on-jsload "untangled-todomvc.test-runner/on-load"}
-                                    :compiler     {:main                 "untangled-todomvc.test-runner"
-                                                   :asset-path           "js/compiled/specs"
-                                                   :parallel-build       true
-                                                   :recompile-dependents true
-                                                   :output-to            "resources/public/js/compiled/todomvc-specs.js"
-                                                   :output-dir           "resources/public/js/compiled/specs"}}
-                       :support {:source-paths ["src/client"]
-                                 :figwheel     true
-                                 :compiler     {:main                 "untangled-todomvc.support-viewer"
-                                                :asset-path           "js/compiled/support"
-                                                :output-to            "resources/public/js/compiled/support.js"
-                                                :output-dir           "resources/public/js/compiled/support"
-                                                :parallel-build       true
-                                                :recompile-dependents true
-                                                :optimizations        :none}}
+  :cljsbuild {:builds [{:id           "dev"
+                        :source-paths ["dev/client" "src/client"]
+                        :figwheel     true
+                        :compiler     {:main                 "cljs.user"
+                                       :asset-path           "js/compiled/dev"
+                                       :output-to            "resources/public/js/compiled/untangled-todomvc.js"
+                                       :output-dir           "resources/public/js/compiled/dev"
+                                       :parallel-build       true
+                                       :recompile-dependents true
+                                       :optimizations        :none}}
+                       {:id           "i18n"
+                        :source-paths ["src/client"]
+                        :compiler     {
+                                       :output-to      "i18n/out/compiled.js"
+                                       :output-dir     "i18n/out"
+                                       :parallel-build true
+                                       :optimizations  :whitespace}}
+                       {:id           "test"
+                        :source-paths ["src/client" "specs/client"]
+                        :figwheel     {:on-jsload "untangled-todomvc.test-runner/on-load"}
+                        :compiler     {:main                 "untangled-todomvc.test-runner"
+                                       :asset-path           "js/compiled/specs"
+                                       :parallel-build       true
+                                       :recompile-dependents true
+                                       :output-to            "resources/public/js/compiled/todomvc-specs.js"
+                                       :output-dir           "resources/public/js/compiled/specs"}}
+                       {:id           "support"
+                        :source-paths ["src/client"]
+                        :figwheel     true
+                        :compiler     {:main                 "untangled-todomvc.support-viewer"
+                                       :asset-path           "js/compiled/support"
+                                       :output-to            "resources/public/js/compiled/support.js"
+                                       :output-dir           "resources/public/js/compiled/support"
+                                       :parallel-build       true
+                                       :recompile-dependents true
+                                       :optimizations        :none}}
 
-                       :production {:source-paths ["src/client"]
-                                    :compiler     {:verbose         true
-                                                   :output-to       "resources/public/js/compiled/untangled-todomvc.min.js"
-                                                   :output-dir      "resources/public/js/compiled"
-                                                   :pretty-print    false
-                                                   :closure-defines {goog.DEBUG false}
-                                                   :source-map      "resources/public/js/compiled/untangled-todomvc.min.js.map"
-                                                   :elide-asserts   true
-                                                   :optimizations   :advanced}}}}
+                       {:id           "production"
+                        :source-paths ["src/client"]
+                        :compiler     {:verbose         true
+                                       :output-to       "resources/public/js/compiled/untangled-todomvc.min.js"
+                                       :output-dir      "resources/public/js/compiled"
+                                       :pretty-print    false
+                                       :closure-defines {goog.DEBUG false}
+                                       :source-map      "resources/public/js/compiled/untangled-todomvc.min.js.map"
+                                       :elide-asserts   true
+                                       :optimizations   :advanced}}]}
 
   :figwheel {:css-dirs    ["resources/public/css"]
              :server-port 2345}

@@ -42,27 +42,27 @@
                           (delete-item id)))]
 
       (dom/li #js {:className (cond-> ""
-                                complete (str "completed")
-                                editing (str " editing"))}
-        (dom/div #js {:className "view"}
-          (dom/input #js {:className "toggle"
-                          :type      "checkbox"
-                          :checked   complete
-                          :onChange  #(if complete (uncheck id) (check id))})
-          (dom/label #js {:onDoubleClick (fn []
-                                           (mut/toggle! this :ui/editing)
-                                           (om/update-state! this assoc :edit-text label))} label)
-          (dom/button #js {:className "destroy"
-                           :onClick   #(delete-item id)}))
-        (dom/input #js {:className "edit"
-                        :ref       "edit_field"
-                        :value     edit-text
-                        :onChange  #(om/update-state! this assoc :edit-text (.. % -target -value))
-                        :onKeyDown #(cond
-                                     (is-enter? %) (submit-edit %)
-                                     (is-escape? %) (do (om/update-state! this assoc :edit-text label)
-                                                        (mut/toggle! this :ui/editing)))
-                        :onBlur    #(when editing (submit-edit %))})))))
+                                      complete (str "completed")
+                                      editing (str " editing"))}
+              (dom/div #js {:className "view"}
+                       (dom/input #js {:className "toggle"
+                                       :type      "checkbox"
+                                       :checked   complete
+                                       :onChange  #(if complete (uncheck id) (check id))})
+                       (dom/label #js {:onDoubleClick (fn []
+                                                        (mut/toggle! this :ui/editing)
+                                                        (om/update-state! this assoc :edit-text label))} label)
+                       (dom/button #js {:className "destroy"
+                                        :onClick   #(delete-item id)}))
+              (dom/input #js {:className "edit"
+                              :ref       "edit_field"
+                              :value     edit-text
+                              :onChange  #(om/update-state! this assoc :edit-text (.. % -target -value))
+                              :onKeyDown #(cond
+                                           (is-enter? %) (submit-edit %)
+                                           (is-escape? %) (do (om/update-state! this assoc :edit-text label)
+                                                              (mut/toggle! this :ui/editing)))
+                              :onBlur    #(when editing (submit-edit %))})))))
 
 (def ui-todo-item (om/factory TodoItem {:keyfn :db/id}))
 
@@ -75,7 +75,6 @@
   Object
   (render [this]
     (let [{:keys [list/items list/filter list/title db/id]} (om/props this)
-          _ (js/console.log items)
           num-todos (count items)
           completed-todos (filterv :item/complete items)
           num-completed (count completed-todos)
@@ -89,32 +88,31 @@
           uncheck (fn [item-id] (om/transact! this `[(todo/uncheck ~{:id item-id})]))]
 
       (dom/div nil
-        (dom/div #js {:style #js {:position "fixed" :top "0" :right "0"} :className "support"}
-          (dom/button #js {:onClick #(om/transact! this '[(support-viewer/send-support-request)])} "Send Request"))
-        (dom/section #js {:className "todoapp"}
 
-          (.header this title)
+               (dom/section #js {:className "todoapp"}
 
-          (when (pos? num-todos)
-            (dom/div nil
-              (dom/section #js {:className "main"}
-                (dom/input #js {:className "toggle-all"
-                                :type      "checkbox"
-                                :checked   all-completed?
-                                :onClick   (fn [] (if all-completed?
-                                                    (om/transact! this `[(todo/uncheck-all)])
-                                                    (om/transact! this `[(todo/check-all)])))
-                                })
-                (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
-                (dom/ul #js {:className "todo-list"}
-                  (map #(ui-todo-item (om/computed %
-                                        {:delete-item delete-item
-                                         :check       check
-                                         :uncheck     uncheck})) filtered-todos)))
+                            (.header this title)
 
-              (.filter-footer this num-todos num-completed))))
+                            (when (pos? num-todos)
+                              (dom/div nil
+                                       (dom/section #js {:className "main"}
+                                                    (dom/input #js {:className "toggle-all"
+                                                                    :type      "checkbox"
+                                                                    :checked   all-completed?
+                                                                    :onClick   (fn [] (if all-completed?
+                                                                                        (om/transact! this `[(todo/uncheck-all)])
+                                                                                        (om/transact! this `[(todo/check-all)])))
+                                                                    })
+                                                    (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
+                                                    (dom/ul #js {:className "todo-list"}
+                                                            (map #(ui-todo-item (om/computed %
+                                                                                             {:delete-item delete-item
+                                                                                              :check       check
+                                                                                              :uncheck     uncheck})) filtered-todos)))
 
-        (.footer-info this))))
+                                       (.filter-footer this num-todos num-completed))))
+
+               (.footer-info this))))
 
   (header [this title]
     (letfn [(add-item [evt]
@@ -124,51 +122,71 @@
                   (set! (.. evt -target -value) ""))))]
 
       (dom/header #js {:className "header"}
-        (dom/h1 nil title)
-        (dom/input #js {:className   "new-todo"
-                        :placeholder "What needs to be done?"
-                        :autoFocus   true
-                        :onKeyDown   add-item}))))
+
+                  (dom/h1 nil title)
+                  (dom/input #js {:className   "new-todo"
+                                  :placeholder "What needs to be done?"
+                                  :autoFocus   true
+                                  :onKeyDown   add-item}))))
 
   (filter-footer [this num-todos num-completed]
     (let [{:keys [list/filter]} (om/props this)
           num-remaining (- num-todos num-completed)]
 
       (dom/footer #js {:className "footer"}
-        (dom/span #js {:className "todo-count"}
-          (dom/strong nil num-remaining)
-          (str (if (= num-remaining 1) " item" " items") " left"))
-        (dom/ul #js {:className "filters"}
-          (dom/li nil
-            (dom/a #js {:className (when (or (nil? filter) (= :list.filter/none filter)) "selected")
-                        :href      "#"} "All"))
-          (dom/li nil
-            (dom/a #js {:className (when (= :list.filter/active filter) "selected")
-                        :href      "#/active"} "Active"))
-          (dom/li nil
-            (dom/a #js {:className (when (= :list.filter/completed filter) "selected")
-                        :href      "#/completed"} "Completed")))
-        (when (pos? num-completed)
-          (dom/button #js {:className "clear-completed"
-                           :onClick   #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
+                  (dom/span #js {:className "todo-count"}
+                            (dom/strong nil num-remaining)
+                            (str (if (= num-remaining 1) " item" " items") " left"))
+                  (dom/ul #js {:className "filters"}
+                          (dom/li nil
+                                  (dom/a #js {:className (when (or (nil? filter) (= :list.filter/none filter)) "selected")
+                                              :href      "#"} "All"))
+                          (dom/li nil
+                                  (dom/a #js {:className (when (= :list.filter/active filter) "selected")
+                                              :href      "#/active"} "Active"))
+                          (dom/li nil
+                                  (dom/a #js {:className (when (= :list.filter/completed filter) "selected")
+                                              :href      "#/completed"} "Completed")))
+                  (when (pos? num-completed)
+                    (dom/button #js {:className "clear-completed"
+                                     :onClick   #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
 
   (footer-info [this]
     (dom/footer #js {:className "info"}
-      (dom/p nil "Double-click to edit a todo")
-      (dom/p nil "Created by "
-        (dom/a #js {:href   "http://www.thenavisway.com"
-                    :target "_blank"} "NAVIS"))
-      (dom/p nil "Part of "
-        (dom/a #js {:href   "http://todomvc.com"
-                    :target "_blank"} "TodoMVC")))))
+                (dom/p nil "Double-click to edit a todo")
+                (dom/p nil "Created by "
+                       (dom/a #js {:href   "http://www.thenavisway.com"
+                                   :target "_blank"} "NAVIS"))
+                (dom/p nil "Part of "
+                       (dom/a #js {:href   "http://todomvc.com"
+                                   :target "_blank"} "TodoMVC")))))
 
 (def ui-todo-list (om/factory TodoList))
 
 (defui ^:once Root
   static om/IQuery
-  (query [this] [:react-key {:todos (om/get-query TodoList)}])
+  (query [this] [:ui/comment :ui/support-visible :react-key :app/locale {:todos (om/get-query TodoList)}])
   Object
   (render [this]
-    (let [{:keys [react-key todos]} (om/props this)]
+    (let [{:keys [ui/comment ui/support-visible react-key todos app/locale]} (om/props this)]
       (dom/div #js {:key (or react-key "ROOT")}
-        (ui-todo-list todos)))))
+               (dom/div #js {:className "locale-selector"}
+                        (dom/select #js {:value    locale
+                                         :onChange (fn [evt]
+                                                     (om/transact! this `[(app/change-locale {:lang ~(.. evt -target -value)})]))}
+                                    (dom/option #js {:value "en-US"} "English")
+                                    (dom/option #js {:value "es-MX"} "Español")))
+               (dom/div #js {:className "support-request"}
+                        (if support-visible
+                          (dom/div #js {}
+                                   (dom/textarea #js {:value    comment
+                                                      :onChange (fn [evt]
+                                                                  (om/transact! this `[(support/set-comment {:value ~(.. evt -target -value)})]))})
+                                   (dom/br nil)
+                                   (dom/button #js {:onClick (fn []
+                                                               (om/transact! this '[(support-viewer/send-support-request) (support/toggle)])
+                                                               (om/transact! this '[(support/set-comment {:value ""})]))} "Send Request"))
+                          (dom/button #js {:onClick #(om/transact! this '[(support/toggle)])} "Help!")
+                          ))
+
+               (ui-todo-list todos)))))

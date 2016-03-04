@@ -4,15 +4,21 @@
             [untangled-todomvc.history :as history]
             [untangled-todomvc.core :as core]))
 
-(defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast]} k p]
-  {:remote (assoc ast :params {:comment "Howdy" :history (history/serialize-history @core/app)})})
+(defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast state]} k p]
+  {:remote (assoc ast :params {:comment (:ui/comment @state) :history (history/serialize-history @core/app)})})
+
+(defmethod m/mutate 'support/toggle [{:keys [state]} k p]
+  {:action (fn [] (swap! state update :ui/support-visible not))})
+
+(defmethod m/mutate 'support/set-comment [{:keys [state]} k {:keys [value]}]
+  {:action (fn [] (swap! state assoc :ui/comment value))})
 
 (defmethod m/mutate 'todo/new-item [{:keys [state ast]} _ {:keys [id text]}]
   {:remote (assoc ast :params {:id id :text text :list (:list @state)})
    :action (fn []
              (swap! state #(-> %
-                            (update-in [:todos :list/items] (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
-                            (assoc-in [:todo/by-id id] {:db/id id :item/label text}))))})
+                               (update-in [:todos :list/items] (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
+                               (assoc-in [:todo/by-id id] {:db/id id :item/label text}))))})
 
 (defmethod m/mutate 'todo/check [{:keys [state]} _ {:keys [id]}]
   {:remote true
@@ -31,8 +37,8 @@
    :action (fn []
              (letfn [(remove-item [todos] (vec (remove #(= id (second %)) todos)))]
                (swap! state #(-> %
-                              (update-in [:todos :list/items] remove-item)
-                              (update :todo/by-id dissoc id)))))})
+                                 (update-in [:todos :list/items] remove-item)
+                                 (update :todo/by-id dissoc id)))))})
 
 (defn- set-completed [val todos]
   (into {} (map (fn [[k v]] [k (assoc v :item/complete val)]) todos)))
@@ -50,8 +56,8 @@
    :action (fn []
              (swap! state (fn [st]
                             (-> st
-                              (update-in [:todos :list/items]
-                                (fn [todos] (vec (remove (fn [[_ id]] (get-in @state [:todo/by-id id :item/complete] false)) todos))))))))})
+                                (update-in [:todos :list/items]
+                                           (fn [todos] (vec (remove (fn [[_ id]] (get-in @state [:todo/by-id id :item/complete] false)) todos))))))))})
 
 (defmethod m/mutate 'todo/filter [{:keys [ast state]} _ {:keys [filter]}]
   {:action (fn [] (swap! state assoc-in [:todos :list/filter] filter))})
