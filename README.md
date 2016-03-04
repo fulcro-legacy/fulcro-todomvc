@@ -10,7 +10,7 @@ the TodoMVC application, with the following extensions:
 
 ## Configure it:
 
-Copy `resources/config/defaults.edn` to `/usr/local/etc/app.edn`.
+Copy `resources/config/defaults.edn` to `/usr/local/etc/todomvc.edn`.
 
 ```
 {                                                                                                                          
