@@ -13,13 +13,14 @@ the TodoMVC application, with the following extensions:
 Copy `resources/config/defaults.edn` to `/usr/local/etc/todomvc.edn`.
 
 ```
-{                                                                                                                          
- :datomic {:dbs {:todo {:url          "datomic:mem://todo"                                                                 
-                        :schema       "todomvc.migrations"                                                                 
-                        :auto-migrate true                                                                                 
-                        :auto-drop    true                                                                                 
-                        }}}                                                                                                
- :port    3000}      
+{ 
+ :datomic {
+   :dbs {
+     :todo {:url "datomic:mem://todo" 
+            :schema "todomvc.migrations" 
+            :auto-migrate true 
+            :auto-drop true}}} 
+ :port 3000} 
 ```
 
 You can configure the datomic database URL to a file-based one if you 
