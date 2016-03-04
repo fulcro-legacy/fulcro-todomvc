@@ -6,6 +6,8 @@
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
             [om.next :as om]
+            untangled-todomvc.i18n.locales
+            untangled-todomvc.i18n.default-locale
             [untangled.client.logging :as log]
             [untangled.client.data-fetch :as df])
   (:import goog.History))
