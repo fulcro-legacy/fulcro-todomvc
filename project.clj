@@ -43,7 +43,7 @@
                                        :optimizations        :none}}
                        {:id           "i18n"
                         :source-paths ["src/client"]
-                        :compiler     {
+                        :compiler     {:main "untangled-todomvc.main"
                                        :output-to      "i18n/out/compiled.js"
                                        :output-dir     "i18n/out"
                                        :parallel-build true

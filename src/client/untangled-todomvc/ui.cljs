@@ -1,6 +1,8 @@
 (ns untangled-todomvc.ui
   (:require [om.next :as om :refer-macros [defui]]
             [untangled.client.mutations :as mut]
+            [untangled.i18n :refer-macros [tr trf]]
+            yahoo.intl-messageformat-with-locales
             [om.dom :as dom]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
@@ -103,7 +105,7 @@
                                                                                         (om/transact! this `[(todo/uncheck-all)])
                                                                                         (om/transact! this `[(todo/check-all)])))
                                                                     })
-                                                    (dom/label #js {:htmlFor "toggle-all"} "Mark all as complete")
+                                                    (dom/label #js {:htmlFor "toggle-all"} (tr "Mark all as complete"))
                                                     (dom/ul #js {:className "todo-list"}
                                                             (map #(ui-todo-item (om/computed %
                                                                                              {:delete-item delete-item
@@ -125,7 +127,7 @@
 
                   (dom/h1 nil title)
                   (dom/input #js {:className   "new-todo"
-                                  :placeholder "What needs to be done?"
+                                  :placeholder (tr "What needs to be done?")
                                   :autoFocus   true
                                   :onKeyDown   add-item}))))
 
@@ -135,26 +137,25 @@
 
       (dom/footer #js {:className "footer"}
                   (dom/span #js {:className "todo-count"}
-                            (dom/strong nil num-remaining)
-                            (str (if (= num-remaining 1) " item" " items") " left"))
+                            (dom/strong nil (trf "{num,plural,=0 {no items} =1 {1 item} other {# items}} left" :num num-remaining)))
                   (dom/ul #js {:className "filters"}
                           (dom/li nil
                                   (dom/a #js {:className (when (or (nil? filter) (= :list.filter/none filter)) "selected")
-                                              :href      "#"} "All"))
+                                              :href      "#"} (tr "All")))
                           (dom/li nil
                                   (dom/a #js {:className (when (= :list.filter/active filter) "selected")
-                                              :href      "#/active"} "Active"))
+                                              :href      "#/active"} (tr "Active")))
                           (dom/li nil
                                   (dom/a #js {:className (when (= :list.filter/completed filter) "selected")
-                                              :href      "#/completed"} "Completed")))
+                                              :href      "#/completed"} (tr "Completed"))))
                   (when (pos? num-completed)
                     (dom/button #js {:className "clear-completed"
-                                     :onClick   #(om/transact! this `[(todo/clear-complete)])} "Clear Completed")))))
+                                     :onClick   #(om/transact! this `[(todo/clear-complete)])} (tr "Clear Completed"))))))
 
   (footer-info [this]
     (dom/footer #js {:className "info"}
-                (dom/p nil "Double-click to edit a todo")
-                (dom/p nil "Created by "
+                (dom/p nil (tr "Double-click to edit a todo"))
+                (dom/p nil (tr "Created by ")
                        (dom/a #js {:href   "http://www.thenavisway.com"
                                    :target "_blank"} "NAVIS"))
                 (dom/p nil "Part of "
@@ -165,10 +166,12 @@
 
 (defui ^:once Root
   static om/IQuery
-  (query [this] [:ui/comment :ui/support-visible :react-key :app/locale {:todos (om/get-query TodoList)}])
+  (query [this] [:ui/support-visible :react-key :app/locale {:todos (om/get-query TodoList)}])
   Object
+  (initLocalState [this] {:comment ""})
   (render [this]
-    (let [{:keys [ui/comment ui/support-visible react-key todos app/locale]} (om/props this)]
+    (let [{:keys [ui/support-visible react-key todos app/locale]} (om/props this)
+          comment (om/get-state this :comment)]
       (dom/div #js {:key (or react-key "ROOT")}
                (dom/div #js {:className "locale-selector"}
                         (dom/select #js {:value    locale
@@ -181,12 +184,13 @@
                           (dom/div #js {}
                                    (dom/textarea #js {:value    comment
                                                       :onChange (fn [evt]
-                                                                  (om/transact! this `[(support/set-comment {:value ~(.. evt -target -value)})]))})
+                                                                  (om/update-state! this assoc :comment (.. evt -target -value)))})
                                    (dom/br nil)
                                    (dom/button #js {:onClick (fn []
-                                                               (om/transact! this '[(support-viewer/send-support-request) (support/toggle)])
-                                                               (om/transact! this '[(support/set-comment {:value ""})]))} "Send Request"))
-                          (dom/button #js {:onClick #(om/transact! this '[(support/toggle)])} "Help!")
+                                                               (om/transact! this `[(support-viewer/send-support-request {:comment ~comment}) (support/toggle)])
+                                                               (om/update-state! this assoc :comment "")
+                                                               )} (tr "Send Request")))
+                          (dom/button #js {:onClick #(om/transact! this '[(support/toggle)])} (tr "Help!"))
                           ))
 
                (ui-todo-list todos)))))

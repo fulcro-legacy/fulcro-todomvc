@@ -4,14 +4,11 @@
             [untangled-todomvc.history :as history]
             [untangled-todomvc.core :as core]))
 
-(defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast state]} k p]
-  {:remote (assoc ast :params {:comment (:ui/comment @state) :history (history/serialize-history @core/app)})})
+(defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast state]} k {:keys [comment]}]
+  {:remote (assoc ast :params {:comment comment :history (history/serialize-history @core/app)})})
 
 (defmethod m/mutate 'support/toggle [{:keys [state]} k p]
   {:action (fn [] (swap! state update :ui/support-visible not))})
-
-(defmethod m/mutate 'support/set-comment [{:keys [state]} k {:keys [value]}]
-  {:action (fn [] (swap! state assoc :ui/comment value))})
 
 (defmethod m/mutate 'todo/new-item [{:keys [state ast]} _ {:keys [id text]}]
   {:remote (assoc ast :params {:id id :text text :list (:list @state)})
