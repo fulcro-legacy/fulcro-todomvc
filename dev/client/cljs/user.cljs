@@ -19,7 +19,7 @@
 
 (log/set-level :debug)
 
-(reset! core/app (uc/mount @core/app ui/TodoList "app"))
+(reset! core/app (uc/mount @core/app ui/Root "app"))
 
 (defonce routing
   (configure-routing! (:reconciler @core/app)))

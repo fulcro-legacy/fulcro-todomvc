@@ -8,13 +8,21 @@
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha30"]
                  [navis/untangled-client "0.4.4"]
+                 [navis/untangled-server "0.4.5" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
+                 [navis/untangled-datomic "0.4.4"]
+                 [com.datomic/datomic-free "0.9.5350"]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
+                 [joda-time "2.8.2"]
+                 [clj-time "0.11.0"]
+                 [commons-codec "1.10"]
+                 [com.taoensso/timbre "4.3.1"]
+                 [com.stuartsierra/component "0.3.1"]
                  [navis/untangled-spec "0.3.5" :scope "test"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
-  :source-paths ["dev/server" "src/client" "specs/client"]
+  :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server"]
 
   :cljsbuild {:builds {:dev        {:source-paths ["dev/client" "src/client"]
                                     :figwheel     true
@@ -34,6 +42,16 @@
                                                    :recompile-dependents true
                                                    :output-to            "resources/public/js/compiled/todomvc-specs.js"
                                                    :output-dir           "resources/public/js/compiled/specs"}}
+                       :support {:source-paths ["src/client"]
+                                 :figwheel     true
+                                 :compiler     {:main                 "untangled-todomvc.support-viewer"
+                                                :asset-path           "js/compiled/support"
+                                                :output-to            "resources/public/js/compiled/support.js"
+                                                :output-dir           "resources/public/js/compiled/support"
+                                                :parallel-build       true
+                                                :recompile-dependents true
+                                                :optimizations        :none}}
+
                        :production {:source-paths ["src/client"]
                                     :compiler     {:verbose         true
                                                    :output-to       "resources/public/js/compiled/untangled-todomvc.min.js"
@@ -55,7 +73,7 @@
                                   :port             7001
                                   }
                    :env          {:dev true}
-                   :dependencies [[figwheel-sidecar "0.5.0-5"]
-                                  [binaryage/devtools "0.5.2"]
+                   :dependencies [[figwheel-sidecar "0.5.0-5" :exclusions [clj-time ring/ring-core commons-fileupload]]
+                                  [binaryage/devtools "0.5.2" :exclusions [environ]]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/tools.nrepl "0.2.12"]]}})
