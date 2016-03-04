@@ -69,6 +69,35 @@ The figwheel build above will start the client test build. Simply open
 (any number of) browsers on 
 [http://localhost:3000/test.html](http://localhost:3000/test.html)
 
+## Internationalization
+
+The i18n support has been integrated into this example. A tutorial video will be out soon. Note
+that there are a few bugs with the implementation (e.g. plural support isn't translating
+at the moment, and the string extraction is a bit fiddly). These are all easy to fix, just
+not the priority yet.
+
+## Viewing a Support Request
+
+You'll need to start the build that creates the support viewer, so use this
+to start figwheel:
+
+```
+JVM_OPTS="-Ddev -Dtest -Dsupport" lein run -m clojure.main script/figwheel.clj
+```
+
+Start the server as before.
+
+Now load dev.html as before, do some operations, and create a support request. The 
+server will persist it, and give a support ID in the server logs. Simply open
+the support viewer with this URL:
+
+[http://localhost:3000/support.html?id=ID_OF_REQUEST](http://localhost:3000/support.html?id=ID_OF_REQUEST)
+
+You should now be able to step back in time through 100 steps of history. Each support request 
+is store separately. The implementation on this server does not persist them
+to Datomic, so they only exist for the lifetime of the server. NOTE: The timestamps
+require Om alpha31+, which was not out at the time of this writing.
+
 ## Credit
 
 Created by [NAVIS](http://www.thenavisway.com)
