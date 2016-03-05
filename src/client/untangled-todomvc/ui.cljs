@@ -166,11 +166,11 @@
 
 (defui ^:once Root
   static om/IQuery
-  (query [this] [:ui/support-visible :react-key :app/locale {:todos (om/get-query TodoList)}])
+  (query [this] [:ui/support-visible :ui/react-key :ui/locale {:todos (om/get-query TodoList)}])
   Object
   (initLocalState [this] {:comment ""})
   (render [this]
-    (let [{:keys [ui/support-visible react-key todos app/locale]} (om/props this)
+    (let [{:keys [ui/support-visible ui/react-key todos ui/locale] :or {ui/react-key "ROOT"}} (om/props this)
           comment (om/get-state this :comment)]
       (dom/div #js {:key (or react-key "ROOT")}
                (dom/div #js {:className "locale-selector"}
