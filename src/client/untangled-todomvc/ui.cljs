@@ -165,8 +165,10 @@
 (def ui-todo-list (om/factory TodoList))
 
 (defui ^:once Root
+  static om/IQueryParams
+  (params [this] {:list "main"})
   static om/IQuery
-  (query [this] [:ui/support-visible :ui/react-key :ui/locale {:todos (om/get-query TodoList)}])
+  (query [this] `[:ui/support-visible :ui/react-key :ui/locale ({:todos ~(om/get-query TodoList)} {:list ~'?list})])
   Object
   (initLocalState [this] {:comment ""})
   (render [this]
@@ -176,7 +178,7 @@
                (dom/div #js {:className "locale-selector"}
                         (dom/select #js {:value    locale
                                          :onChange (fn [evt]
-                                                     (om/transact! this `[(app/change-locale {:lang ~(.. evt -target -value)})]))}
+                                                     (om/transact! this `[(ui/change-locale {:lang ~(.. evt -target -value)})]))}
                                     (dom/option #js {:value "en-US"} "English")
                                     (dom/option #js {:value "es-MX"} "Español")))
                (dom/div #js {:className "support-request"}
@@ -190,7 +192,6 @@
                                                                (om/transact! this `[(support-viewer/send-support-request {:comment ~comment}) (support/toggle)])
                                                                (om/update-state! this assoc :comment "")
                                                                )} (tr "Send Request")))
-                          (dom/button #js {:onClick #(om/transact! this '[(support/toggle)])} (tr "Help!"))
-                          ))
+                          (dom/button #js {:onClick #(om/transact! this '[(support/toggle)])} (tr "Help!"))))
 
                (ui-todo-list todos)))))

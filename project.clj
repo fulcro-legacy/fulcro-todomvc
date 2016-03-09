@@ -7,6 +7,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha31"]
+                 [org.clojure/tools.cli "0.3.1"]
                  [navis/untangled-client "0.4.5"]
                  [navis/untangled-server "0.4.5" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
                  [navis/untangled-datomic "0.4.4"]
@@ -20,7 +21,7 @@
                  [navis/untangled-spec "0.3.5" :scope "test"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]
-            [navis/untangled-lein-i18n "0.1.2"]]
+            [navis/untangled-lein-i18n "0.1.2" :exclusions [org.codehaus.plexus/plexus-utils]]]
 
   :untangled-i18n {:default-locale        "en-US"
                    :translation-namespace untangled-todomvc.i18n
@@ -32,7 +33,7 @@
   :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server"]
 
   :cljsbuild {:builds [{:id           "dev"
-                        :source-paths ["dev/client" "src/client"]
+                        :source-paths ["dev/client" "src/client" "checkouts/untangled-client/src" ]
                         :figwheel     true
                         :compiler     {:main                 "cljs.user"
                                        :asset-path           "js/compiled/dev"
@@ -43,7 +44,7 @@
                                        :optimizations        :none}}
                        {:id           "i18n"
                         :source-paths ["src/client"]
-                        :compiler     {:main "untangled-todomvc.main"
+                        :compiler     {:main           "untangled-todomvc.main"
                                        :output-to      "i18n/out/compiled.js"
                                        :output-dir     "i18n/out"
                                        :parallel-build true

@@ -20,8 +20,8 @@
   ([url]
    (let [query-data (.getQueryData (goog.Uri. url))]
      (into {}
-       (for [k (.getKeys query-data)]
-         [k (.get query-data k)])))))
+           (for [k (.getKeys query-data)]
+             [k (.get query-data k)])))))
 
 (defn get-url-param
   ([param-name] (get-url-param (get-url) param-name))
@@ -31,9 +31,10 @@
 (defn on-app-started [app]
   (let [reconciler (:reconciler app)
         state (om/app-state reconciler)
+        root (om/app-root reconciler)
         list (:list @state)]
-    (df/load-collection reconciler (om/get-query ui/Root) :params {:list list}
-                        :without #{:list/filter})
+    (om/set-query! root {:params {:list list}})
+    (df/load-collection reconciler (om/get-query root) :without #{:list/filter})
     (configure-routing! reconciler))
   (let [h (History.)]
     (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
