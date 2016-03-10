@@ -6,7 +6,6 @@
     untangled-todomvc.mutations
     [untangled.client.logging :as log]
     [untangled-todomvc.ui :as ui]
-    [untangled-todomvc.history :as history]
     [untangled-todomvc.routing :refer [configure-routing!]]
     [untangled.client.core :as uc]
     [cljs.reader :as reader]))
@@ -30,6 +29,3 @@
               (select-keys app-state keywords)))))
 
 
-(comment
-  (untangled-todomvc.history/set-storage! (untangled-todomvc.history/serialize-history @untangled-todomvc.core/app))
-  )

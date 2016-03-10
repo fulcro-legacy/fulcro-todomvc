@@ -2,7 +2,6 @@
   (:require [untangled.client.core :as core]
             [untangled.support-viewer :as viewer]
             [untangled-todomvc.ui :as ui]
-            [untangled-todomvc.history :as history]
             [devtools.core :as devtools]))
 
 (defonce cljs-build-tools

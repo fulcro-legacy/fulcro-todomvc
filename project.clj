@@ -1,4 +1,4 @@
-(defproject untangled-todomvc "0.3.0-SNAPSHOT"
+(defproject untangled-todomvc "1.0.0"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
   :license {:name "MIT"
@@ -33,7 +33,7 @@
   :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server"]
 
   :cljsbuild {:builds [{:id           "dev"
-                        :source-paths ["dev/client" "src/client" "checkouts/untangled-client/src" ]
+                        :source-paths ["dev/client" "src/client"]
                         :figwheel     true
                         :compiler     {:main                 "cljs.user"
                                        :asset-path           "js/compiled/dev"

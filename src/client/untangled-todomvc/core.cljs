@@ -31,10 +31,8 @@
 (defn on-app-started [app]
   (let [reconciler (:reconciler app)
         state (om/app-state reconciler)
-        root (om/app-root reconciler)
         list (:list @state)]
-    (om/set-query! root {:params {:list list}})
-    (df/load-collection reconciler (om/get-query root) :without #{:list/filter})
+    (df/load-collection reconciler (om/get-query ui/Root) :without #{:list/filter} :params {:todos {:list list}})
     (configure-routing! reconciler))
   (let [h (History.)]
     (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))

@@ -1,11 +1,11 @@
 (ns untangled-todomvc.mutations
   (:require [untangled.client.mutations :as m]
             [untangled.dom :refer [unique-key]]
-            [untangled-todomvc.history :as history]
+            [untangled.client.core :as uc]
             [untangled-todomvc.core :as core]))
 
 (defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast state]} k {:keys [comment]}]
-  {:remote (assoc ast :params {:comment comment :history (history/serialize-history @core/app)})})
+  {:remote (assoc ast :params {:comment comment :history (uc/history @core/app)})})
 
 (defmethod m/mutate 'support/toggle [{:keys [state]} k p]
   {:action (fn [] (swap! state update :ui/support-visible not))})

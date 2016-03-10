@@ -165,10 +165,8 @@
 (def ui-todo-list (om/factory TodoList))
 
 (defui ^:once Root
-  static om/IQueryParams
-  (params [this] {:list "main"})
   static om/IQuery
-  (query [this] `[:ui/support-visible :ui/react-key :ui/locale ({:todos ~(om/get-query TodoList)} {:list ~'?list})])
+  (query [this] `[:ui/support-visible :ui/react-key :ui/locale {:todos ~(om/get-query TodoList)}])
   Object
   (initLocalState [this] {:comment ""})
   (render [this]
