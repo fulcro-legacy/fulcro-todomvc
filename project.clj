@@ -8,7 +8,7 @@
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha31"]
                  [org.clojure/tools.cli "0.3.1"]
-                 [navis/untangled-client "0.4.5"]
+                 [navis/untangled-client "0.4.7-SNAPSHOT"]
                  [navis/untangled-server "0.4.5" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
                  [navis/untangled-datomic "0.4.4"]
                  [com.datomic/datomic-free "0.9.5350"]
