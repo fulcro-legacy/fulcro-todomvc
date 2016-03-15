@@ -100,14 +100,13 @@ Start the server as before.
 
 Now load dev.html as before, do some operations, and create a support request. The 
 server will persist it, and give a support ID in the server logs. Simply open
-the support viewer with this URL:
+the support viewer with this URL (embedding the correct ID from the server log):
 
 [http://localhost:3000/support.html?id=ID_OF_REQUEST](http://localhost:3000/support.html?id=ID_OF_REQUEST)
 
-You should now be able to step back in time through 100 steps of history. Each support request 
-is store separately. The implementation on this server does not persist them
-to Datomic, so they only exist for the lifetime of the server. NOTE: The timestamps
-require Om alpha31+, which was not out at the time of this writing.
+You should now be able to step back in time through up to 100 steps of history. Each support request 
+is stored separately. The implementation on this server does not persist them
+to Datomic, so they only exist for the lifetime of the server. 
 
 ## Credit
 
