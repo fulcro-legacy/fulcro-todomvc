@@ -1,12 +1,15 @@
 # Untangled • [TodoMVC](http://todomvc.com)
 
 A client-only standard todomvc is on the `client-only` branch of this
-git repository. This branch contains a full-stack implementation of 
+git repository. The `master` branch is the released version, and we
+use Git Flow, so the `develop` branch is active development.
+
+Both `develop` and `master` contain a full-stack implementation of 
 the TodoMVC application, with the following extensions:
 
 - Lists are persisted on the server (currently selected by adding a ?list=X param to URL)
-- Internationalization (coming soon)
-- Support VCR Viewer (coming soon)
+- Internationalization 
+- Support VCR Viewer
 
 ## Configure it:
 
@@ -30,6 +33,8 @@ your lists persist over server restarts. Leave
 
 ## Running it:
 
+### Figwheel/Clojurescript Build
+
 Start figwheel (the JVM options tell figwheel which builds to run):
 
 ```
@@ -38,7 +43,13 @@ JVM_OPTS="-Ddev -Dtest" lein run -m clojure.main script/figwheel.clj
 
 which should start auto-building the cljs source and show a browser REPL.
 
-Start a CLJ REPL:
+You can do this in IntelliJ using a regular Clojure Main REPL that runs
+`script/figwheel.clj` (Parameters field). The `-Ddev` and `-Dtest` options can go in the JVM 
+arguments field.
+
+### Server
+
+Start a CLJ REPL (e.g. command line or IntelliJ):
 
 ```
 lein repl
