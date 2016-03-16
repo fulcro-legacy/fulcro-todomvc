@@ -27,7 +27,6 @@
  untangled.i18n.core/*loaded-translations*
  (fn [x] (assoc x "es-MX" translations)))
 
-(if
- (exists? js/i18nDevMode)
- :noop
- (-> goog.module.ModuleManager .getInstance (.setLoaded "es-MX")))
+(try
+ (-> goog.module.ModuleManager .getInstance (.setLoaded "es-MX"))
+ (catch js/Object obj))

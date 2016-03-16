@@ -31,3 +31,4 @@ resources/public/js
 node_modules
 resources/private/js
 TAGS
+*.log

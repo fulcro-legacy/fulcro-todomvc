@@ -7,21 +7,26 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha31"]
-                 [org.clojure/tools.cli "0.3.1"]
                  [navis/untangled-client "0.4.7-SNAPSHOT"]
                  [navis/untangled-server "0.4.5" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
-                 [navis/untangled-datomic "0.4.4"]
+                 [navis/untangled-datomic "0.4.4" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5350"]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
                  [joda-time "2.8.2"]
                  [clj-time "0.11.0"]
+                 [lein-doo "0.1.6" :scope "test" :exclusions [org.clojure/tools.reader]]
+                 [org.clojure/tools.namespace "0.2.11"]
                  [commons-codec "1.10"]
                  [com.taoensso/timbre "4.3.1"]
                  [com.stuartsierra/component "0.3.1"]
                  [navis/untangled-spec "0.3.5" :scope "test"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]
-            [navis/untangled-lein-i18n "0.1.2" :exclusions [org.codehaus.plexus/plexus-utils]]]
+            [lein-doo "0.1.6" :exclusions [org.clojure/tools.reader]]
+            [navis/untangled-lein-i18n "0.1.2" :exclusions [org.codehaus.plexus/plexus-utils org.clojure/tools.cli org.apache.maven.wagon/wagon-provider-api]]]
+
+  :doo {:build "automated-tests"
+        :paths {:karma "node_modules/karma/bin/karma"}}
 
   :untangled-i18n {:default-locale        "en-US"
                    :translation-namespace untangled-todomvc.i18n
@@ -58,6 +63,13 @@
                                        :recompile-dependents true
                                        :output-to            "resources/public/js/compiled/todomvc-specs.js"
                                        :output-dir           "resources/public/js/compiled/specs"}}
+                       {:id           "automated-tests"
+                        :source-paths ["src/client" "specs/client"]
+                        :compiler     {:output-to     "resources/private/js/unit-tests.js"
+                                       :main          untangled-todomvc.all-tests
+                                       :asset-path    "js"
+                                       :output-dir    "resources/private/js"
+                                       :optimizations :none }}
                        {:id           "support"
                         :source-paths ["src/client"]
                         :figwheel     true

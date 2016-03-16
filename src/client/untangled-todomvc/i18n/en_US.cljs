@@ -8,7 +8,6 @@
  untangled.i18n.core/*loaded-translations*
  (fn [x] (assoc x "en-US" translations)))
 
-(if
- (exists? js/i18nDevMode)
- :noop
- (-> goog.module.ModuleManager .getInstance (.setLoaded "en-US")))
+(try
+ (-> goog.module.ModuleManager .getInstance (.setLoaded "en-US"))
+ (catch js/Object obj))
