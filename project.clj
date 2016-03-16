@@ -44,7 +44,6 @@
                                        :asset-path           "js/compiled/dev"
                                        :output-to            "resources/public/js/compiled/untangled-todomvc.js"
                                        :output-dir           "resources/public/js/compiled/dev"
-                                       :parallel-build       true
                                        :recompile-dependents true
                                        :optimizations        :none}}
                        {:id           "i18n"
@@ -52,14 +51,12 @@
                         :compiler     {:main           "untangled-todomvc.main"
                                        :output-to      "i18n/out/compiled.js"
                                        :output-dir     "i18n/out"
-                                       :parallel-build true
                                        :optimizations  :whitespace}}
                        {:id           "test"
                         :source-paths ["src/client" "specs/client"]
                         :figwheel     {:on-jsload "untangled-todomvc.test-runner/on-load"}
                         :compiler     {:main                 "untangled-todomvc.test-runner"
                                        :asset-path           "js/compiled/specs"
-                                       :parallel-build       true
                                        :recompile-dependents true
                                        :output-to            "resources/public/js/compiled/todomvc-specs.js"
                                        :output-dir           "resources/public/js/compiled/specs"}}
@@ -77,7 +74,6 @@
                                        :asset-path           "js/compiled/support"
                                        :output-to            "resources/public/js/compiled/support.js"
                                        :output-dir           "resources/public/js/compiled/support"
-                                       :parallel-build       true
                                        :recompile-dependents true
                                        :optimizations        :none}}
 
@@ -103,7 +99,7 @@
                                   :port             7001
                                   }
                    :env          {:dev true}
-                   :dependencies [[figwheel-sidecar "0.5.0-5" :exclusions [clj-time ring/ring-core commons-fileupload]]
+                   :dependencies [[figwheel-sidecar "0.5.0-6"]
                                   [binaryage/devtools "0.5.2" :exclusions [environ]]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/tools.nrepl "0.2.12"]]}})
