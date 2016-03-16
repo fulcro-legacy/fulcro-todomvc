@@ -13,6 +13,8 @@ the TodoMVC application, with the following extensions:
 
 ## Configure it:
 
+WARNING: The server will not start without this step!
+
 Copy `resources/config/defaults.edn` to `/usr/local/etc/todomvc.edn`.
 
 ```
