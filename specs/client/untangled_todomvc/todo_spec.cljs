@@ -90,3 +90,14 @@
     ((:action (m/mutate {:state state} 'todo/filter {:filter :my-filter})))
     (assertions
       (-> @state :todos :list/filter) => :my-filter)))
+
+(specification "Delete todo"
+  (let [state (atom {:todos      [[:todo/by-id 1] [:todo/by-id 2]]
+                     :todo/by-id {1 {:id 1 :text "Hello"}
+                                  2 {:id 2 :text "Bye" :completed true}}})]
+
+    ((:action (m/mutate {:state state} 'todo/delete-item {:id 1})))
+    (assertions
+      "deletes todo from app state."
+      (:todos @state) => [[:todo/by-id 2]]
+      (:todo/by-id @state) => {2 {:id 2 :text "Bye" :completed true}})))
