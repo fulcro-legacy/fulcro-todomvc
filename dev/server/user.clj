@@ -45,9 +45,11 @@
   (reset! system (system/make-system)))
 
 (defn start "Start (an already initialized) web server." [] (swap! system component/start))
-(defn stop "Stop the running web server." []
-  (swap! system component/stop)
-  (reset! system nil))
+
+(defn stop "Stop the running web server. Is a no-op if the server is already stopped" []
+  (when @system
+    (swap! system component/stop)
+    (reset! system nil)))
 
 (defn go "Load the overall web server system and start it." []
   (init)
