@@ -19,7 +19,8 @@
                  [commons-codec "1.10"]
                  [com.taoensso/timbre "4.3.1"]
                  [com.stuartsierra/component "0.3.1"]
-                 [navis/untangled-spec "0.3.5" :scope "test"]]
+                 [navis/untangled-spec "0.3.5" :scope "test"]
+                 [juxt/dirwatch "0.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]
             [lein-doo "0.1.6" :exclusions [org.clojure/tools.reader]]
