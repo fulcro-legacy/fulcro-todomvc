@@ -1,4 +1,4 @@
-(defproject untangled-todomvc "1.0.0"
+(defproject untangled-todomvc "1.0.1"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
   :license {:name "MIT"
@@ -7,8 +7,8 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha32"]
-                 [navis/untangled-client "0.4.7-SNAPSHOT"]
-                 [navis/untangled-server "0.4.5" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
+                 [navis/untangled-client "0.4.8"]
+                 [navis/untangled-server "0.4.7" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
                  [navis/untangled-datomic "0.4.4" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5350"]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
@@ -19,7 +19,7 @@
                  [commons-codec "1.10"]
                  [com.taoensso/timbre "4.3.1"]
                  [com.stuartsierra/component "0.3.1"]
-                 [navis/untangled-spec "0.3.5" :scope "test"]]
+                 [navis/untangled-spec "0.3.6" :scope "test"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]
             [lein-doo "0.1.6" :exclusions [org.clojure/tools.reader]]
@@ -35,7 +35,7 @@
                    }
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "i18n/out"]
-  :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server"]
+  :source-paths ["dev/server" "dev/watcher" "src/client" "src/server" "specs/client" "specs/server"]
 
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["dev/client" "src/client"]

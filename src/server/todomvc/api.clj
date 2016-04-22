@@ -116,7 +116,7 @@
 
 (defn api-read [{:keys [todo-database query] :as env} k {:keys [list] :as params}]
   (let [connection (db/get-connection todo-database)]
-    (timbre/info params)
+    (timbre/info "Query: " query)
     (case k
       :todos {:value (read-list connection query list)}
       :support-request (let [id (:id params)]
