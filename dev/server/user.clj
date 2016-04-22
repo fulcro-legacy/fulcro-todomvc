@@ -8,6 +8,7 @@
     [figwheel-sidecar.repl-api :as ra]
     [taoensso.timbre :refer [info set-level!] :as timbre]
     [todomvc.system :as system]
+    [watch :refer [start-watching stop-watching reset-fn]]
     [juxt.dirwatch :as dw]))
 
 
@@ -33,9 +34,9 @@
 
 ;;SERVER
 
-(set-refresh-dirs "src/server" "specs/server")
+(set-refresh-dirs "src/server" "specs/server" "dev/server")
 
-(defonce system (atom nil))
+(def system (atom nil))
 
 (set-level! :info)
 
@@ -61,18 +62,4 @@
   (stop)
   (refresh :after 'user/go))
 
-(defonce watcher (atom nil))
-
-(defn start-watching []
-  (if-not @watcher
-    (reset! watcher
-            (dw/watch-dir (fn [{file :file}]
-                            (let [file-name (.getName file)]
-                              (when (re-matches #".*\.clj$" file-name)
-                                (timbre/info "Reload triggered by: " file-name)
-                                (with-bindings {#'*ns* *ns*}
-                                  (reset)))))
-                          (clojure.java.io/file "src/server")))))
-
-(defn stop-watching []
-  (swap! watcher dw/close-watcher))
+(reset! watch/reset-fn reset)

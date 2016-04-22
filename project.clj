@@ -19,7 +19,7 @@
                  [commons-codec "1.10"]
                  [com.taoensso/timbre "4.3.1"]
                  [com.stuartsierra/component "0.3.1"]
-                 [navis/untangled-spec "0.3.5" :scope "test"]]
+                 [navis/untangled-spec "0.3.6" :scope "test"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]
             [lein-doo "0.1.6" :exclusions [org.clojure/tools.reader]]
@@ -35,7 +35,7 @@
                    }
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "i18n/out"]
-  :source-paths ["dev/server" "src/client" "src/server" "specs/client" "specs/server"]
+  :source-paths ["dev/server" "dev/watcher" "src/client" "src/server" "specs/client" "specs/server"]
 
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["dev/client" "src/client"]
