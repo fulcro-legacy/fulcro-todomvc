@@ -4,15 +4,15 @@
   :license {:name "MIT"
             :url  "https://opensource.org/licenses/MIT"}
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.228"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.8.51"]
                  [org.omcljs/om "1.0.0-alpha32"]
-                 [navis/untangled-client "0.4.8"]
+                 [navis/untangled-client "0.4.9"]
                  [navis/untangled-server "0.4.7" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
-                 [navis/untangled-datomic "0.4.4" :exclusions [org.clojure/tools.cli]]
-                 [com.datomic/datomic-free "0.9.5350"]
+                 [navis/untangled-datomic "0.4.8" :exclusions [org.clojure/tools.cli]]
+                 [com.datomic/datomic-free "0.9.5359"]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
-                 [joda-time "2.8.2"]
+                 [joda-time "2.9.3"]
                  [clj-time "0.11.0"]
                  [lein-doo "0.1.6" :scope "test" :exclusions [org.clojure/tools.reader]]
                  [org.clojure/tools.namespace "0.2.11"]
@@ -99,8 +99,8 @@
                                   :port             7001
                                   }
                    :env          {:dev true}
-                   :dependencies [[figwheel-sidecar "0.5.0-6"]
+                   :dependencies [[figwheel-sidecar "0.5.3-1"]
                                   [juxt/dirwatch "0.2.3"]
-                                  [binaryage/devtools "0.5.2" :exclusions [environ]]
+                                  [binaryage/devtools "0.6.1" :exclusions [environ]]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/tools.nrepl "0.2.12"]]}})
