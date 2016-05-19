@@ -1,4 +1,4 @@
-(defproject untangled-todomvc "1.0.1"
+(defproject untangled-todomvc "1.0.2-SNAPSHOT"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
   :license {:name "MIT"
