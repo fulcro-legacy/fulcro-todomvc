@@ -10,7 +10,7 @@
                  [navis/untangled-client "0.4.9-SNAPSHOT"]
                  [navis/untangled-server "0.4.7" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
                  [navis/untangled-datomic "0.4.8" :exclusions [org.clojure/tools.cli]]
-                 [com.datomic/datomic-free "0.9.5359"]
+                 [com.datomic/datomic-free "0.9.5359" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
                  [joda-time "2.9.3"]
                  [clj-time "0.11.0"]
@@ -21,7 +21,7 @@
                  [com.stuartsierra/component "0.3.1"]
                  [navis/untangled-spec "0.3.6" :scope "test"]]
 
-  :plugins [[lein-cljsbuild "1.1.2"]
+  :plugins [[lein-cljsbuild "1.1.3"]
             [lein-doo "0.1.6" :exclusions [org.clojure/tools.reader]]
             [navis/untangled-lein-i18n "0.1.2" :exclusions [org.codehaus.plexus/plexus-utils org.clojure/tools.cli org.apache.maven.wagon/wagon-provider-api]]]
 
@@ -48,10 +48,10 @@
                                        :optimizations        :none}}
                        {:id           "i18n"
                         :source-paths ["src/client"]
-                        :compiler     {:main           "untangled-todomvc.main"
-                                       :output-to      "i18n/out/compiled.js"
-                                       :output-dir     "i18n/out"
-                                       :optimizations  :whitespace}}
+                        :compiler     {:main          "untangled-todomvc.main"
+                                       :output-to     "i18n/out/compiled.js"
+                                       :output-dir    "i18n/out"
+                                       :optimizations :whitespace}}
                        {:id           "test"
                         :source-paths ["src/client" "specs/client"]
                         :figwheel     {:on-jsload "untangled-todomvc.test-runner/on-load"}
@@ -66,7 +66,7 @@
                                        :main          untangled-todomvc.all-tests
                                        :asset-path    "js"
                                        :output-dir    "resources/private/js"
-                                       :optimizations :none }}
+                                       :optimizations :none}}
                        {:id           "support"
                         :source-paths ["src/client"]
                         :figwheel     true
@@ -99,7 +99,7 @@
                                   :port             7001
                                   }
                    :env          {:dev true}
-                   :dependencies [[figwheel-sidecar "0.5.3-1"]
+                   :dependencies [[figwheel-sidecar "0.5.3-1" :exclusions [ring/ring-core]]
                                   [juxt/dirwatch "0.2.3"]
                                   [binaryage/devtools "0.6.1" :exclusions [environ]]
                                   [com.cemerick/piggieback "0.2.1"]
