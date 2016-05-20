@@ -17,4 +17,5 @@
       :config-path config-path
       :parser (om/parser {:read api/api-read :mutate logging-mutate})
       :parser-injections #{:todo-database}
-      :components {:todo-database (build-database :todo)})))
+      :components {:todo-database (build-database :todo)
+                   :logger        {}})))
