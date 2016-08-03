@@ -6,9 +6,9 @@
 
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
-                 [org.omcljs/om "1.0.0-alpha34"]
-                 [navis/untangled-client "0.4.11-SNAPSHOT"]
-                 [navis/untangled-server "0.5.1-SNAPSHOT" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
+                 [org.omcljs/om "1.0.0-alpha40"]
+                 [navis/untangled-client "0.5.3"]
+                 [navis/untangled-server "0.6.1" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
                  [navis/untangled-datomic "0.4.9" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5359" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
@@ -35,10 +35,10 @@
                    }
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "i18n/out"]
-  :source-paths ["dev/server" "dev/watcher" "src/client" "src/server" "specs/client" "specs/server" "checkouts/untangled-client/src"]
+  :source-paths ["dev/server" "dev/watcher" "src/client" "src/server" "specs/client" "specs/server"]
 
   :cljsbuild {:builds [{:id           "dev"
-                        :source-paths ["dev/client" "src/client""checkouts/untangled-client/src"]
+                        :source-paths ["dev/client" "src/client"]
                         :figwheel     true
                         :compiler     {:main                 "cljs.user"
                                        :asset-path           "js/compiled/dev"
