@@ -1,4 +1,4 @@
-(defproject untangled-todomvc "1.0.2"
+(defproject untangled-todomvc "1.0.3-SNAPSHOT"
   :description "TodoMVC implemention using untangled.client"
   :url "http://www.thenavisway.com/"
   :license {:name "MIT"
@@ -6,9 +6,9 @@
 
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
-                 [org.omcljs/om "1.0.0-alpha32"]
-                 [navis/untangled-client "0.4.10"]
-                 [navis/untangled-server "0.4.8" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
+                 [org.omcljs/om "1.0.0-alpha40"]
+                 [navis/untangled-client "0.5.3"]
+                 [navis/untangled-server "0.6.1" :exclusions [io.aviso/pretty org.clojure/clojurescript]]
                  [navis/untangled-datomic "0.4.9" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5359" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]

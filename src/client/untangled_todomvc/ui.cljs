@@ -21,7 +21,7 @@
   (ident [_ props] [:todo/by-id (:db/id props)])
   Object
   (initLocalState [this]
-    {:edit-text (:text (om/props this))})
+    {:edit-text (or (:text (om/props this)) "")})
 
   (componentDidUpdate [this prev-props _]
     ;; Code adapted from React TodoMVC implementation
