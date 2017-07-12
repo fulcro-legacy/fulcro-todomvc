@@ -1,7 +1,7 @@
-(ns untangled-todomvc.ui
+(ns fulcro-todomvc.ui
   (:require [om.next :as om :refer-macros [defui]]
-            [untangled.client.mutations :as mut]
-            [untangled.i18n :refer-macros [tr trf]]
+            [fulcro.client.mutations :as mut]
+            [fulcro.i18n :refer-macros [tr trf]]
             yahoo.intl-messageformat-with-locales
             [om.dom :as dom]))
 

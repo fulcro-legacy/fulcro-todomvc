@@ -1,8 +1,8 @@
-(ns untangled-todomvc.mutations
-  (:require [untangled.client.mutations :as m]
-            [untangled.dom :refer [unique-key]]
-            [untangled.client.core :as uc]
-            [untangled-todomvc.core :as core]))
+(ns fulcro-todomvc.mutations
+  (:require [fulcro.client.mutations :as m]
+            [fulcro.dom :refer [unique-key]]
+            [fulcro.client.core :as uc]
+            [fulcro-todomvc.core :as core]))
 
 (defmethod m/mutate 'support-viewer/send-support-request [{:keys [ast state]} k {:keys [comment]}]
   {:remote (assoc ast :params {:comment comment :history (uc/history @core/app)})})

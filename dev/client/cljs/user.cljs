@@ -2,12 +2,12 @@
   (:require
     [cljs.pprint :refer [pprint]]
     [devtools.core :as devtools]
-    [untangled-todomvc.core :as core]
-    untangled-todomvc.mutations
-    [untangled.client.logging :as log]
-    [untangled-todomvc.ui :as ui]
-    [untangled-todomvc.routing :refer [configure-routing!]]
-    [untangled.client.core :as uc]
+    [fulcro-todomvc.core :as core]
+    fulcro-todomvc.mutations
+    [fulcro.client.logging :as log]
+    [fulcro-todomvc.ui :as ui]
+    [fulcro-todomvc.routing :refer [configure-routing!]]
+    [fulcro.client.core :as uc]
     [cljs.reader :as reader]))
 
 (enable-console-print!)

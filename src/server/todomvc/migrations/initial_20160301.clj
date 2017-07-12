@@ -1,6 +1,6 @@
 (ns todomvc.migrations.initial-20160301
   (:require [datomic.api :as d]
-            [untangled.datomic.schema :as s]))
+            [fulcro.datomic.schema :as s]))
 
 (defn transactions []
   [(s/generate-schema

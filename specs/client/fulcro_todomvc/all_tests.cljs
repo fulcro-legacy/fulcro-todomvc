@@ -1,6 +1,6 @@
-(ns untangled-todomvc.all-tests
+(ns fulcro-todomvc.all-tests
   (:require
-    untangled-todomvc.tests-to-run
+    fulcro-todomvc.tests-to-run
     [doo.runner :refer-macros [doo-all-tests]]))
 
 (doo-all-tests #".*-spec")

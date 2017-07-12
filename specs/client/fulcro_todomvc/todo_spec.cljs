@@ -1,9 +1,9 @@
-(ns untangled-todomvc.todo-spec
+(ns fulcro-todomvc.todo-spec
   (:require
-    untangled-todomvc.mutations
-    [untangled.client.mutations :as m]
-    [untangled-spec.core :refer-macros [specification behavior assertions when-mocking]]
-    [untangled.dom :refer [unique-key]]
+    fulcro-todomvc.mutations
+    [fulcro.client.mutations :as m]
+    [fulcro-spec.core :refer-macros [specification behavior assertions when-mocking]]
+    [fulcro.dom :refer [unique-key]]
     [om.next :as om]))
 
 (specification "Adding a todo."

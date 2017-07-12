@@ -1,12 +1,12 @@
 (ns
- untangled-todomvc.i18n.locales
+ fulcro-todomvc.i18n.locales
  (:require
   goog.module
   goog.module.ModuleLoader
   [goog.module.ModuleManager :as module-manager]
-  [untangled.i18n.core :as i18n]
-  untangled-todomvc.i18n.en-US
-  untangled-todomvc.i18n.es-MX)
+  [fulcro.i18n.core :as i18n]
+  fulcro-todomvc.i18n.en-US
+  fulcro-todomvc.i18n.es-MX)
  (:import goog.module.ModuleManager))
 
 (defonce manager (module-manager/getInstance))

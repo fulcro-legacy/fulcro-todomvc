@@ -1,1 +1,1 @@
-(ns untangled-todomvc.api-spec)
+(ns fulcro-todomvc.api-spec)

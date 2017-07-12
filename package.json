@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:untangled-web/untangled-todomvc.git"
+    "url": "git@github.com:fulcrologic/fulcro-todomvc.git"
   },
   "author": "",
   "license": "NAVIS"

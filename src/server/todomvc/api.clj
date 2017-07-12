@@ -1,7 +1,7 @@
 (ns todomvc.api
   (:require [om.next.server :as om]
             [datomic.api :as d]
-            [untangled.datomic.protocols :as db]
+            [fulcro.datomic.protocols :as db]
             [taoensso.timbre :as timbre]))
 
 (defmulti apimutate om/dispatch)

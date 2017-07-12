@@ -1,15 +1,15 @@
-(ns untangled-todomvc.core
-  (:require [untangled.client.core :as uc]
-            [untangled-todomvc.ui :as ui]
-            [untangled-todomvc.routing :refer [configure-routing!]]
+(ns fulcro-todomvc.core
+  (:require [fulcro.client.core :as uc]
+            [fulcro-todomvc.ui :as ui]
+            [fulcro-todomvc.routing :refer [configure-routing!]]
             [goog.events :as events]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
             [om.next :as om]
-            untangled-todomvc.i18n.locales
-            untangled-todomvc.i18n.default-locale
-            [untangled.client.logging :as log]
-            [untangled.client.data-fetch :as df])
+            fulcro-todomvc.i18n.locales
+            fulcro-todomvc.i18n.default-locale
+            [fulcro.client.logging :as log]
+            [fulcro.client.data-fetch :as df])
   (:import goog.History))
 
 (defn get-url
@@ -38,7 +38,7 @@
     (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (doto h (.setEnabled true))))
 
-(defonce app (atom (uc/new-untangled-client
+(defonce app (atom (uc/new-fulcro-client
                      :initial-state {:list  (or (get-url-param "list") "main")
                                      :todos {:list/title  ""
                                              :list/items  []
