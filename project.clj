@@ -1,12 +1,13 @@
 (defproject fulcro-todomvc "1.0.0-SNAPSHOT"
   :description "TodoMVC implemention using Fulcro"
+  :min-lein-version "2.7.0"
   :license {:name "MIT"
             :url  "https://opensource.org/licenses/MIT"}
 
   :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
                  [org.clojure/clojurescript "1.9.671"]
                  [org.omcljs/om "1.0.0-beta1"]
-                 [fulcrologic/fulcro "1.0.0-beta2"]
+                 [fulcrologic/fulcro "1.0.0-beta3"]
                  [fulcrologic/fulcro-datomic "1.0.0-SNAPSHOT" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5561" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
@@ -73,6 +74,7 @@
                                        :asset-path           "js/compiled/support"
                                        :output-to            "resources/public/js/compiled/support.js"
                                        :output-dir           "resources/public/js/compiled/support"
+                                       :preloads             [devtools.preload]
                                        :recompile-dependents true
                                        :optimizations        :none}}
 

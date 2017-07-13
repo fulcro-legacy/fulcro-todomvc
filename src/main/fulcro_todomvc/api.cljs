@@ -53,4 +53,5 @@
   (remote [{:keys [ast state]}] (assoc ast :params {:id (:list @state)})))
 
 (defmutation todo-filter [{:keys [filter]}]
-  (action [{:keys [state]}] (swap! state assoc-in [:todos :list/filter] filter)))
+  (action [{:keys [state]}]
+    (swap! state assoc-in [:todos :list/filter] filter)))

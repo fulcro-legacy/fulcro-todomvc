@@ -4,7 +4,7 @@
             [goog.events :as events]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
-            [fulcro-todomvc.api :as m]                ; ensures mutations are loaded
+            [fulcro-todomvc.api :as m]                      ; ensures mutations are loaded
             [fulcro.client.mutations :refer [defmutation mutate]]
             [om.next :as om]
             fulcro-todomvc.i18n.locales                     ; make sure i18n resources are loaded
@@ -12,18 +12,21 @@
             [fulcro.client.data-fetch :as df])
   (:import goog.History))
 
+(defn delayed-transact! [r tx]
+  (js/setTimeout #(om/transact! r tx) 10))
 
 (defn configure-routing! [reconciler]
   (secretary/set-config! :prefix "#")
 
+  ; Secretary could fire an event *while* we're in setup, so we delay txes
   (defroute active-items "/active" []
-    (om/transact! reconciler `[(m/todo-filter {:filter :list.filter/active})]))
+    (delayed-transact! (om/app-root reconciler) `[(m/todo-filter {:filter :list.filter/active})]))
 
   (defroute completed-items "/completed" []
-    (om/transact! reconciler `[(m/todo-filter {:filter :list.filter/completed})]))
+    (delayed-transact! (om/app-root reconciler) `[(m/todo-filter {:filter :list.filter/completed})]))
 
   (defroute all-items "*" []
-    (om/transact! reconciler `[(m/todo-filter {:filter :list.filter/none})])))
+    (delayed-transact! (om/app-root reconciler) `[(m/todo-filter {:filter :list.filter/none})])))
 
 (defn get-url
   [] (-> js/window .-location .-href))
@@ -55,6 +58,6 @@
 (defonce app (atom (uc/new-fulcro-client
                      :started-callback on-app-started)))
 
-; support viewer mutation needs to be here, so app can be resolved without a circular reference
+; support viewer mutation needs to be here, so app history can be resolved without a circular reference
 (defmethod mutate 'support/send-request [{:keys [ast state]} _ {:keys [comment]}]
   {:remote (assoc ast :params {:comment comment :history (uc/history @app)})})

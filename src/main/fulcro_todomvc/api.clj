@@ -140,8 +140,8 @@
   "Get a support request by server ID (see server logs (NOT CLIENT Tx ID)"
   (value [env {:keys [id]}]
     (let [id      (ensure-integer id)
-          history (get @requests id)]
+          history (get @requests id [])]
       (timbre/info "Request for client history: " id)
-      (when-not history
+      (when-not (seq history)
         (timbre/error "Invalid history ID! Perhaps you used a client tx id instead? Known IDs are: " (pr-str (keys @requests))))
       history)))
