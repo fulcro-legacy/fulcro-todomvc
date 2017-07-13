@@ -1,21 +1,15 @@
 # Fulcro • [TodoMVC](http://todomvc.com)
 
-A client-only standard todomvc is on the `client-only` branch of this
-git repository. The `master` branch is the released version, and we
-use Git Flow, so the `develop` branch is active development.
+This is a  full-stack implementation of
+the TodoMVC application. It extends the requirements of the standard TodoMVC to include:
 
-Both `develop` and `master` contain a full-stack implementation of 
-the TodoMVC application, with the following extensions:
-
-- Lists are persisted on the server (currently selected by adding a ?list=X param to URL)
+- Server-side Persistence: Lists are persisted in an in-memory Datomic instance (you can have more than one list, selected by adding a ?list=X param to URL).
 - Internationalization 
 - Support VCR Viewer
 
-## Configure it:
+## Configure it (optional):
 
-WARNING: The server will not start without this step!
-
-Copy `resources/config/defaults.edn` to `/usr/local/etc/todomvc.edn`.
+You can edit `resources/config/dev.edn`, which contains:
 
 ```
 { 
@@ -46,7 +40,7 @@ JVM_OPTS="-Ddev -Dtest" lein run -m clojure.main script/figwheel.clj
 which should start auto-building the cljs source and show a browser REPL.
 
 You can do this in IntelliJ using a regular Clojure Main REPL that runs
-`script/figwheel.clj` (Parameters field). The `-Ddev` and `-Dtest` options can go in the JVM 
+`script/figwheel.clj` (Parameters field). Put the `-Ddev` and `-Dtest` options can go in the JVM
 arguments field.
 
 Our internal figwheel support uses Java system properties to select the
@@ -75,9 +69,9 @@ Navigate to: [http://localhost:3000/dev.html?list=MyList](http://localhost:3000/
 The list URL parameter allows you to select which persisted TODO list on the server
 you want.
 
-Changes to the source should re-render without a browser reload. 
+If you make changes to the source code hot code reload will re-render without a browser reload.
 
-Changes to server code can be put into effect at the REPL (will wipe database) with:
+Changes to server code can be put into effect at the REPL (NOTE: will wipe database) with:
 
 ```
 (reset)
@@ -91,7 +85,17 @@ The figwheel build above will start the client test build. Simply open
 
 ## Internationalization
 
-The i18n support has been integrated into this example. A tutorial video will be out soon. 
+The i18n support has been integrated into this example.
+
+Some basics:
+
+- The functions `tr` and `trf` are used to format string (in English).
+- Strings can be extracted for use with GNU gettext against the whitespace-optimized generated javascript.
+- Translations can be processed with GNU tools like poedit.
+- Translations can be used to generate cljs code files for the locales.
+- See `src/fulcro_todomvc/i18n/es_MX.cljs` to see what the generated translation code looks like.
+- Search for uses of `tr` and `trf` in `src/fulcro_todomvc/ui.cljs` to see what it looks like to work with them in UI.
+- Missing translations simply show up untranslated (not as blanks).
 
 ## Viewing a Support Request
 
@@ -106,10 +110,10 @@ Start the server as before.
 
 Now load dev.html as before, do some operations, and create a support request
 using the Help button at the top of the screen. The server will persist it 
-(in memory only), and give a support ID in the server logs. Simply open the 
+(in memory only), and give a support ID in the **server logs** (starting with ID 1001). Simply open the
 support viewer with this URL (embedding the correct ID from the server log):
 
-[http://localhost:3000/support.html?id=ID_OF_REQUEST](http://localhost:3000/support.html?id=ID_OF_REQUEST)
+[http://localhost:3000/support.html?id=1001](http://localhost:3000/support.html?id=1001)
 
 You should now be able to step back in time through up to 100 steps of history. Each support request 
 is stored separately. The implementation on this server does not persist them
