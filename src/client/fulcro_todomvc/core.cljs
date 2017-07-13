@@ -32,7 +32,7 @@
   (let [reconciler (:reconciler app)
         state (om/app-state reconciler)
         list (:list @state)]
-    (df/load-data reconciler (om/get-query ui/Root) :without #{:list/filter} :params {:todos {:list list}})
+    (df/load app :todos (om/get-query ui/TodoList) {:without #{:list/filter} :params {:todos {:list list}}})
     (configure-routing! reconciler))
   (let [h (History.)]
     (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))

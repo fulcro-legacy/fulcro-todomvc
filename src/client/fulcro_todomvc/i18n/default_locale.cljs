@@ -1,4 +1,4 @@
-(ns fulcro-todomvc.i18n.default-locale (:require fulcro-todomvc.i18n.en-US [fulcro.i18n.core :as i18n]))
+(ns fulcro-todomvc.i18n.default-locale (:require fulcro-todomvc.i18n.en-US [fulcro.i18n :as i18n]))
 
 (reset! i18n/*current-locale* "en-US")
 

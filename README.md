@@ -87,7 +87,7 @@ Changes to server code can be put into effect at the REPL (will wipe database) w
 
 The figwheel build above will start the client test build. Simply open
 (any number of) browsers on 
-[http://localhost:3000/test.html](http://localhost:3000/test.html)
+[http://localhost:3000/fulcro-spec-client-tests.html](http://localhost:3000/fulcro-spec-client-tests.html)
 
 ## Internationalization
 
@@ -117,4 +117,7 @@ to Datomic, so they only exist for the lifetime of the server.
 
 ## Credit
 
-Created by [NAVIS](http://www.thenavisway.com)
+Currently maintained by Fulcrologic.
+
+Based upon work Created by NAVIS.
+

@@ -1,6 +1,6 @@
 (ns fulcro-todomvc.mutations
   (:require [fulcro.client.mutations :as m]
-            [fulcro.dom :refer [unique-key]]
+            [fulcro.client.util :refer [unique-key]]
             [fulcro.client.core :as uc]
             [fulcro-todomvc.core :as core]))
 

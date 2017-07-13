@@ -1,11 +1,10 @@
 (ns todomvc.system
   (:require
-    [fulcro.server.core :as core]
+    [fulcro.easy-server :as core]
     [todomvc.api :as api]
     [om.next.server :as om]
     [taoensso.timbre :as timbre]
-    [fulcro.datomic.core :refer [build-database]]
-    [fulcro.server.core :as c]))
+    [fulcro.datomic.core :refer [build-database]]))
 
 (defn logging-mutate [env k params]
   (timbre/info "Mutation Request: " k)

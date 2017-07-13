@@ -1,37 +1,34 @@
 (defproject fulcro-todomvc "1.0.3-SNAPSHOT"
-  :description "TodoMVC implemention using fulcro.client"
-  :url "http://www.thenavisway.com/"
+  :description "TodoMVC implemention using Fulcro"
   :license {:name "MIT"
             :url  "https://opensource.org/licenses/MIT"}
 
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.8.51"]
-                 [org.omcljs/om "1.0.0-alpha40"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
+                 [org.clojure/clojurescript "1.9.671"]
+                 [org.omcljs/om "1.0.0-beta1"]
                  [fulcrologic/fulcro "1.0.0-beta2"]
                  [fulcrologic/fulcro-datomic "1.0.0-SNAPSHOT" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5359" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
-                 [joda-time "2.9.3"]
-                 [clj-time "0.11.0"]
-                 [lein-doo "0.1.6" :scope "test" :exclusions [org.clojure/tools.reader]]
-                 [org.clojure/tools.namespace "0.2.11"]
+                 [joda-time "2.9.9"]
+                 [clj-time "0.13.0"]
+                 [lein-doo "0.1.7" :scope "test" :exclusions [org.clojure/tools.reader]]
+                 [org.clojure/tools.namespace "0.3.0-alpha4"]
                  [commons-codec "1.10"]
-                 [com.taoensso/timbre "4.3.1"]
-                 [com.stuartsierra/component "0.3.1"]
+                 [com.taoensso/timbre "4.10.0"]
+                 [com.stuartsierra/component "0.3.2"]
                  [fulcrologic/fulcro-spec "1.0.0-beta2" :scope "test"]]
 
-  :plugins [[lein-cljsbuild "1.1.3"]
-            [lein-doo "0.1.6" :exclusions [org.clojure/tools.reader]]
-            [navis/fulcro-lein-i18n "0.1.2" :exclusions [org.codehaus.plexus/plexus-utils org.clojure/tools.cli org.apache.maven.wagon/wagon-provider-api]]]
+  :plugins [[lein-cljsbuild "1.1.6"]
+            [lein-doo "0.1.7" :exclusions [org.clojure/tools.reader]]]
 
   :doo {:build "automated-tests"
         :paths {:karma "node_modules/karma/bin/karma"}}
 
   :fulcro-i18n {:default-locale        "en-US"
-                   :translation-namespace fulcro-todomvc.i18n
-                   :source-folder         "src/client"
-                   :target-build          "i18n"
-                   }
+                :translation-namespace fulcro-todomvc.i18n
+                :source-folder         "src/client"
+                :target-build          "i18n"}
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "i18n/out"]
   :source-paths ["dev/server" "dev/watcher" "src/client" "src/server" "specs/client" "specs/server"]
@@ -53,12 +50,12 @@
                                        :optimizations :whitespace}}
                        {:id           "test"
                         :source-paths ["src/client" "specs/client"]
-                        :figwheel     {:on-jsload "fulcro-todomvc.test-runner/on-load"}
+                        :figwheel     {:on-jsload fulcro-todomvc.test-runner/on-load}
                         :compiler     {:main                 "fulcro-todomvc.test-runner"
-                                       :asset-path           "js/compiled/specs"
+                                       :asset-path           "js/test"
                                        :recompile-dependents true
-                                       :output-to            "resources/public/js/compiled/todomvc-specs.js"
-                                       :output-dir           "resources/public/js/compiled/specs"}}
+                                       :output-to            "resources/public/js/test/test.js"
+                                       :output-dir           "resources/public/js/test"}}
                        {:id           "automated-tests"
                         :source-paths ["src/client" "specs/client"]
                         :compiler     {:output-to     "resources/private/js/unit-tests.js"
@@ -98,8 +95,7 @@
                                   :port             7001
                                   }
                    :env          {:dev true}
-                   :dependencies [[figwheel-sidecar "0.5.3-1" :exclusions [ring/ring-core]]
-                                  [juxt/dirwatch "0.2.3"]
-                                  [binaryage/devtools "0.6.1" :exclusions [environ]]
-                                  [com.cemerick/piggieback "0.2.1"]
-                                  [org.clojure/tools.nrepl "0.2.12"]]}})
+                   :dependencies [[figwheel-sidecar "0.5.11" :exclusions [ring/ring-core]]
+                                  [binaryage/devtools "0.9.4" :exclusions [environ]]
+                                  [com.cemerick/piggieback "0.2.2"]
+                                  [org.clojure/tools.nrepl "0.2.13"]]}})

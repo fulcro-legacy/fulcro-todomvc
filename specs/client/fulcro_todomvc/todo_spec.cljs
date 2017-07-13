@@ -2,8 +2,8 @@
   (:require
     fulcro-todomvc.mutations
     [fulcro.client.mutations :as m]
-    [fulcro-spec.core :refer-macros [specification behavior assertions when-mocking]]
-    [fulcro.dom :refer [unique-key]]
+    [fulcro-spec.core :refer [specification behavior assertions when-mocking]]
+    [fulcro.client.util :refer [unique-key]]
     [om.next :as om]))
 
 (specification "Adding a todo."
