@@ -1,4 +1,4 @@
-(defproject fulcro-todomvc "1.0.3-SNAPSHOT"
+(defproject fulcro-todomvc "1.0.0-SNAPSHOT"
   :description "TodoMVC implemention using Fulcro"
   :license {:name "MIT"
             :url  "https://opensource.org/licenses/MIT"}
@@ -31,42 +31,45 @@
                 :target-build          "i18n"}
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "i18n/out"]
-  :source-paths ["dev/server" "dev/watcher" "src/client" "src/server" "specs/client" "specs/server"]
+  :source-paths ["src/main"]
+  :test-paths ["src/test"]
 
   :cljsbuild {:builds [{:id           "dev"
-                        :source-paths ["dev/client" "src/client"]
+                        :source-paths ["dev/client" "src/main"]
                         :figwheel     true
-                        :compiler     {:main                 "cljs.user"
+                        :compiler     {:main                 cljs.user
                                        :asset-path           "js/compiled/dev"
                                        :output-to            "resources/public/js/compiled/fulcro-todomvc.js"
                                        :output-dir           "resources/public/js/compiled/dev"
                                        :recompile-dependents true
+                                       :preloads             [devtools.preload]
                                        :optimizations        :none}}
                        {:id           "i18n"
-                        :source-paths ["src/client"]
-                        :compiler     {:main          "fulcro-todomvc.main"
+                        :source-paths ["src/main"]
+                        :compiler     {:main          fulcro-todomvc.client-main-production
                                        :output-to     "i18n/out/compiled.js"
                                        :output-dir    "i18n/out"
                                        :optimizations :whitespace}}
                        {:id           "test"
-                        :source-paths ["src/client" "specs/client"]
+                        :source-paths ["src/main" "src/test"]
                         :figwheel     {:on-jsload fulcro-todomvc.test-runner/on-load}
-                        :compiler     {:main                 "fulcro-todomvc.test-runner"
+                        :compiler     {:main                 fulcro-todomvc.test-runner
                                        :asset-path           "js/test"
                                        :recompile-dependents true
+                                       :preloads             [devtools.preload]
                                        :output-to            "resources/public/js/test/test.js"
                                        :output-dir           "resources/public/js/test"}}
                        {:id           "automated-tests"
-                        :source-paths ["src/client" "specs/client"]
+                        :source-paths ["src/main" "src/test"]
                         :compiler     {:output-to     "resources/private/js/unit-tests.js"
                                        :main          fulcro-todomvc.all-tests
                                        :asset-path    "js"
                                        :output-dir    "resources/private/js"
                                        :optimizations :none}}
                        {:id           "support"
-                        :source-paths ["src/client"]
+                        :source-paths ["src/main"]
                         :figwheel     true
-                        :compiler     {:main                 "fulcro-todomvc.support-viewer"
+                        :compiler     {:main                 fulcro-todomvc.support-viewer
                                        :asset-path           "js/compiled/support"
                                        :output-to            "resources/public/js/compiled/support.js"
                                        :output-dir           "resources/public/js/compiled/support"
@@ -74,8 +77,9 @@
                                        :optimizations        :none}}
 
                        {:id           "production"
-                        :source-paths ["src/client"]
+                        :source-paths ["src/main"]
                         :compiler     {:verbose         true
+                                       :main            fulcro-todomvc.client-main-production
                                        :output-to       "resources/public/js/compiled/fulcro-todomvc.min.js"
                                        :output-dir      "resources/public/js/compiled"
                                        :pretty-print    false
@@ -89,6 +93,7 @@
 
   :profiles {
              :dev {
+                   :source-paths ["src/main" "dev/client" "dev/server"]
                    :repl-options {
                                   :init-ns          user
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]

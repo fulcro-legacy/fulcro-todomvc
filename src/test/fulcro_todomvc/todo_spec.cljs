@@ -1,6 +1,6 @@
 (ns fulcro-todomvc.todo-spec
   (:require
-    fulcro-todomvc.mutations
+    fulcro-todomvc.api
     [fulcro.client.mutations :as m]
     [fulcro-spec.core :refer [specification behavior assertions when-mocking]]
     [fulcro.client.util :refer [unique-key]]

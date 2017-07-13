@@ -1,4 +1,4 @@
-(ns todomvc.migrations.initial-20160301
+(ns fulcro-todomvc.migrations.initial-20160301
   (:require [datomic.api :as d]
             [fulcro.datomic.schema :as s]))
 

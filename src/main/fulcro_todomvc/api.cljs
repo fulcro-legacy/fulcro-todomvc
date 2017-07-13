@@ -1,4 +1,4 @@
-(ns fulcro-todomvc.mutations
+(ns fulcro-todomvc.api
   (:require [fulcro.client.mutations :as m :refer [defmutation]]
             [fulcro.client.util :refer [unique-key]]
             [fulcro.support-viewer :as v]))

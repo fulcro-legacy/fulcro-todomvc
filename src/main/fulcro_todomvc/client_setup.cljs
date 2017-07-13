@@ -1,18 +1,29 @@
-(ns fulcro-todomvc.core
+(ns fulcro-todomvc.client-setup
   (:require [fulcro.client.core :as uc]
             [fulcro-todomvc.ui :as ui]
-            [fulcro-todomvc.routing :refer [configure-routing!]]
             [goog.events :as events]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
-            fulcro-todomvc.mutations ; ensures mutations are loaded
-            [fulcro.client.mutations :refer [defmutation]]
+            [fulcro-todomvc.api :as m]                ; ensures mutations are loaded
+            [fulcro.client.mutations :refer [defmutation mutate]]
             [om.next :as om]
-            fulcro-todomvc.i18n.locales
+            fulcro-todomvc.i18n.locales                     ; make sure i18n resources are loaded
             fulcro-todomvc.i18n.default-locale
-            [fulcro.client.logging :as log]
             [fulcro.client.data-fetch :as df])
   (:import goog.History))
+
+
+(defn configure-routing! [reconciler]
+  (secretary/set-config! :prefix "#")
+
+  (defroute active-items "/active" []
+    (om/transact! reconciler `[(m/todo-filter {:filter :list.filter/active})]))
+
+  (defroute completed-items "/completed" []
+    (om/transact! reconciler `[(m/todo-filter {:filter :list.filter/completed})]))
+
+  (defroute all-items "*" []
+    (om/transact! reconciler `[(m/todo-filter {:filter :list.filter/none})])))
 
 (defn get-url
   [] (-> js/window .-location .-href))
@@ -45,10 +56,5 @@
                      :started-callback on-app-started)))
 
 ; support viewer mutation needs to be here, so app can be resolved without a circular reference
-(defmutation send-support-request
-  "Mutation: Send a support request with the application's serialized UI history to the server."
-  [{:keys [comment]}]
-  (remote [{:keys [ast state]}]
-    (assoc ast :params {:comment comment :history (uc/history @app)})))
-
-
+(defmethod mutate 'support/send-request [{:keys [ast state]} _ {:keys [comment]}]
+  {:remote (assoc ast :params {:comment comment :history (uc/history @app)})})

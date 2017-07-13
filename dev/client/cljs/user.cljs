@@ -1,22 +1,14 @@
 (ns cljs.user
   (:require
     [cljs.pprint :refer [pprint]]
-    [devtools.core :as devtools]
-    [fulcro-todomvc.core :as core]
-    fulcro-todomvc.mutations
+    [fulcro-todomvc.client-setup :as core]
     [fulcro.client.logging :as log]
     [fulcro-todomvc.ui :as ui]
-    [fulcro-todomvc.routing :refer [configure-routing!]]
-    [fulcro.client.core :as uc]
-    [cljs.reader :as reader]))
+    [fulcro.client.core :as uc]))
 
 (enable-console-print!)
-
-(defonce cljs-build-tools
-  (do (devtools/enable-feature! :sanity-hints)
-      (devtools.core/install!)))
-
 (log/set-level :debug)
+
 (reset! core/app (uc/mount @core/app ui/Root "app"))
 
 (defn log-app-state

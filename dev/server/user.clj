@@ -6,8 +6,8 @@
     [clojure.tools.namespace.repl :refer [disable-reload! refresh clear set-refresh-dirs]]
     [com.stuartsierra.component :as component]
     [figwheel-sidecar.system :as fig]
-    [taoensso.timbre :refer [info set-level!] :as timbre]
-    [todomvc.system :as system]))
+    [taoensso.timbre :refer [set-level!] :as timbre]
+    [fulcro-todomvc.server :as server]))
 
 
 ;;FIGWHEEL
@@ -36,7 +36,7 @@
 
 ;;SERVER
 
-(set-refresh-dirs "src/server" "specs/server" "dev/server")
+(set-refresh-dirs "src/main" "src/test" "dev/server")
 
 (def system (atom nil))
 
@@ -45,7 +45,7 @@
 (defn init
   "Create a web server from configurations. Use `start` to start it."
   []
-  (reset! system (system/make-system)))
+  (reset! system (server/make-system)))
 
 (defn start "Start (an already initialized) web server." [] (swap! system component/start))
 

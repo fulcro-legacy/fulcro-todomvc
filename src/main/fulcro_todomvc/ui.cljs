@@ -1,7 +1,7 @@
 (ns fulcro-todomvc.ui
   (:require [om.next :as om :refer [defui]]
             [fulcro.client.mutations :as mut]
-            [fulcro-todomvc.mutations :as m]
+            [fulcro-todomvc.api :as m]
             [fulcro.i18n :refer [tr trf]]
             yahoo.intl-messageformat-with-locales
             [om.dom :as dom]
@@ -193,7 +193,7 @@
                                              (om/update-state! this assoc :comment (.. evt -target -value)))})
               (dom/br nil)
               (dom/button #js {:onClick (fn []
-                                          (om/transact! this `[(m/send-support-request {:comment ~comment}) (m/toggle-support {})])
+                                          (om/transact! this `[(support/send-request {:comment ~comment}) (m/toggle-support {})])
                                           (om/update-state! this assoc :comment "")
                                           )} (tr "Send Request")))
             (dom/button #js {:onClick #(om/transact! this `[(m/toggle-support {})])} (tr "Help!"))))
