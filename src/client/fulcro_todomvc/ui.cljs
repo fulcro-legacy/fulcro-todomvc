@@ -1,6 +1,7 @@
 (ns fulcro-todomvc.ui
   (:require [om.next :as om :refer [defui]]
             [fulcro.client.mutations :as mut]
+            [fulcro-todomvc.mutations :as m]
             [fulcro.i18n :refer [tr trf]]
             yahoo.intl-messageformat-with-locales
             [om.dom :as dom]
@@ -33,13 +34,13 @@
         (.setSelectionRange input-field input-field-length input-field-length))))
 
   (render [this]
-    (let [{:keys [db/id item/label item/complete ui/editing]} (om/props this)
+    (let [{:keys [db/id item/label item/complete ui/editing] :or {complete false}} (om/props this)
           edit-text   (om/get-state this :edit-text)
           {:keys [delete-item check uncheck]} (om/get-computed this)
           submit-edit (fn [evt]
                         (if-let [trimmed-text (trim-text (.. evt -target -value))]
                           (do
-                            (om/transact! this `[(todo/edit ~{:id id :text trimmed-text})])
+                            (om/transact! this `[(m/todo-edit ~{:id id :text trimmed-text})])
                             (om/update-state! this assoc :edit-text trimmed-text)
                             (mut/toggle! this :ui/editing))
                           (delete-item id)))]
@@ -72,7 +73,7 @@
 (defui ^:once TodoList
   static uc/InitialAppState
   (initial-state [t p] {:db/id (om/tempid) :list/items [] :list/title "main" :list/filter :list.filter/none})
-  static om/IQuery
+ static om/IQuery
   (query [this] [:db/id
                  {:list/items (om/get-query TodoItem)}
                  :list/title
@@ -88,9 +89,9 @@
                             :list.filter/active (filterv (comp not :item/complete) items)
                             :list.filter/completed completed-todos
                             items)
-          delete-item     (fn [item-id] (om/transact! this `[(todo/delete-item ~{:id item-id})]))
-          check           (fn [item-id] (om/transact! this `[(todo/check ~{:id item-id})]))
-          uncheck         (fn [item-id] (om/transact! this `[(todo/uncheck ~{:id item-id})]))]
+          delete-item     (fn [item-id] (om/transact! this `[(m/todo-delete-item ~{:id item-id})]))
+          check           (fn [item-id] (om/transact! this `[(m/todo-check ~{:id item-id})]))
+          uncheck         (fn [item-id] (om/transact! this `[(m/todo-uncheck ~{:id item-id})]))]
 
       (dom/div nil
 
@@ -105,8 +106,8 @@
                                 :type      "checkbox"
                                 :checked   all-completed?
                                 :onClick   (fn [] (if all-completed?
-                                                    (om/transact! this `[(todo/uncheck-all)])
-                                                    (om/transact! this `[(todo/check-all)])))
+                                                    (om/transact! this `[(m/todo-uncheck-all {})])
+                                                    (om/transact! this `[(m/todo-check-all {})])))
                                 })
                 (dom/label #js {:htmlFor "toggle-all"} (tr "Mark all as complete"))
                 (dom/ul #js {:className "todo-list"}
@@ -123,7 +124,7 @@
     (letfn [(add-item [evt]
               (when (is-enter? evt)
                 (when-let [trimmed-text (trim-text (.. evt -target -value))]
-                  (om/transact! this `[(todo/new-item ~{:id (om/tempid) :text trimmed-text})])
+                  (om/transact! this `[(m/todo-new-item ~{:id (om/tempid) :text trimmed-text})])
                   (set! (.. evt -target -value) ""))))]
 
       (dom/header #js {:className "header"}
@@ -153,7 +154,7 @@
                         :href      "#/completed"} (tr "Completed"))))
         (when (pos? num-completed)
           (dom/button #js {:className "clear-completed"
-                           :onClick   #(om/transact! this `[(todo/clear-complete)])} (tr "Clear Completed"))))))
+                           :onClick   #(om/transact! this `[(m/todo-clear-complete {})])} (tr "Clear Completed"))))))
 
   (footer-info [this]
     (dom/footer #js {:className "info"}
@@ -192,9 +193,9 @@
                                              (om/update-state! this assoc :comment (.. evt -target -value)))})
               (dom/br nil)
               (dom/button #js {:onClick (fn []
-                                          (om/transact! this `[(support-viewer/send-support-request {:comment ~comment}) (support/toggle)])
+                                          (om/transact! this `[(m/send-support-request {:comment ~comment}) (m/toggle-support {})])
                                           (om/update-state! this assoc :comment "")
                                           )} (tr "Send Request")))
-            (dom/button #js {:onClick #(om/transact! this '[(support/toggle)])} (tr "Help!"))))
+            (dom/button #js {:onClick #(om/transact! this `[(m/toggle-support {})])} (tr "Help!"))))
 
         (ui-todo-list todos)))))

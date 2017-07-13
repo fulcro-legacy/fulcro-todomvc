@@ -5,6 +5,8 @@
             [goog.events :as events]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
+            fulcro-todomvc.mutations ; ensures mutations are loaded
+            [fulcro.client.mutations :refer [defmutation]]
             [om.next :as om]
             fulcro-todomvc.i18n.locales
             fulcro-todomvc.i18n.default-locale
@@ -41,5 +43,12 @@
 
 (defonce app (atom (uc/new-fulcro-client
                      :started-callback on-app-started)))
+
+; support viewer mutation needs to be here, so app can be resolved without a circular reference
+(defmutation send-support-request
+  "Mutation: Send a support request with the application's serialized UI history to the server."
+  [{:keys [comment]}]
+  (remote [{:keys [ast state]}]
+    (assoc ast :params {:comment comment :history (uc/history @app)})))
 
 
