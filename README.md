@@ -1,5 +1,7 @@
 # Fulcro • [TodoMVC](http://todomvc.com)
 
+[![Build Status](https://travis-ci.org/fulcrologic/fulcro-todomvc.svg?branch=master)](https://travis-ci.org/fulcrologic/fulcro-todomvc)
+
 This is a  full-stack implementation of
 the TodoMVC application. It extends the requirements of the standard TodoMVC to include:
 
