@@ -3,7 +3,8 @@
             [fulcro.client.mutations :as mut]
             [fulcro.i18n :refer [tr trf]]
             yahoo.intl-messageformat-with-locales
-            [om.dom :as dom]))
+            [om.dom :as dom]
+            [fulcro.client.core :as uc]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
 (defn is-escape? [evt] (= 27 (.-keyCode evt)))
@@ -69,6 +70,8 @@
 (def ui-todo-item (om/factory TodoItem {:keyfn :db/id}))
 
 (defui ^:once TodoList
+  static uc/InitialAppState
+  (initial-state [t p] {:db/id (om/tempid) :list/items [] :list/title "main" :list/filter :list.filter/none})
   static om/IQuery
   (query [this] [:db/id
                  {:list/items (om/get-query TodoItem)}
@@ -165,6 +168,8 @@
 (def ui-todo-list (om/factory TodoList))
 
 (defui ^:once Root
+  static uc/InitialAppState
+  (initial-state [c p] {:todos (uc/get-initial-state TodoList {})})
   static om/IQuery
   (query [this] `[:ui/support-visible :ui/react-key :ui/locale {:todos ~(om/get-query TodoList)}])
   Object
@@ -176,7 +181,7 @@
         (dom/div #js {:className "locale-selector"}
           (dom/select #js {:value    locale
                            :onChange (fn [evt]
-                                       (om/transact! this `[(ui/change-locale {:lang ~(.. evt -target -value)})]))}
+                                       (om/transact! this `[(mut/change-locale {:lang ~(.. evt -target -value)})]))}
             (dom/option #js {:value "en-US"} "English")
             (dom/option #js {:value "es-MX"} "Español")))
         (dom/div #js {:className "support-request"}

@@ -20,8 +20,8 @@
   ([url]
    (let [query-data (.getQueryData (goog.Uri. url))]
      (into {}
-           (for [k (.getKeys query-data)]
-             [k (.get query-data k)])))))
+       (for [k (.getKeys query-data)]
+         [k (.get query-data k)])))))
 
 (defn get-url-param
   ([param-name] (get-url-param (get-url) param-name))
@@ -30,19 +30,16 @@
 
 (defn on-app-started [app]
   (let [reconciler (:reconciler app)
-        state (om/app-state reconciler)
-        list (:list @state)]
-    (df/load app :todos (om/get-query ui/TodoList) {:without #{:list/filter} :params {:todos {:list list}}})
+        state      (om/app-state reconciler)
+        list       (or (get-url-param "list") "main")]
+    (swap! state assoc :list list)
+    (df/load app :todos ui/TodoList {:without #{:list/filter} :params {:list list}})
     (configure-routing! reconciler))
   (let [h (History.)]
     (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (doto h (.setEnabled true))))
 
 (defonce app (atom (uc/new-fulcro-client
-                     :initial-state {:list  (or (get-url-param "list") "main")
-                                     :todos {:list/title  ""
-                                             :list/items  []
-                                             :list/filter :none}}
                      :started-callback on-app-started)))
 
 

@@ -38,6 +38,7 @@
 (defn find-list
   "Find or create a list with the given name. Always returns a valid list ID."
   [conn list-name]
+  (timbre/info list-name)
   (if-let [eid (d/q '[:find ?e . :in $ ?n :where [?e :list/title ?n]] (d/db conn) list-name)]
     eid
     (make-list conn list-name)))
@@ -116,7 +117,7 @@
 
 (defn api-read [{:keys [todo-database query] :as env} k {:keys [list] :as params}]
   (let [connection (db/get-connection todo-database)]
-    (timbre/info "Query: " query)
+    (timbre/info "Query: " query " Params: " params)
     (case k
       :todos {:value (read-list connection query list)}
       :support-request (let [id (:id params)]

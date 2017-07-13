@@ -8,7 +8,7 @@
                  [org.omcljs/om "1.0.0-beta1"]
                  [fulcrologic/fulcro "1.0.0-beta2"]
                  [fulcrologic/fulcro-datomic "1.0.0-SNAPSHOT" :exclusions [org.clojure/tools.cli]]
-                 [com.datomic/datomic-free "0.9.5359" :exclusions [com.google.guava/guava]]
+                 [com.datomic/datomic-free "0.9.5561" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
                  [joda-time "2.9.9"]
                  [clj-time "0.13.0"]
