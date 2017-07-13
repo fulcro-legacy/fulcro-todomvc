@@ -83,7 +83,10 @@ Changes to server code can be put into effect at the REPL (NOTE: will wipe datab
 
 The figwheel build above will start the client test build. Simply open
 (any number of) browsers on 
-[http://localhost:3000/fulcro-spec-client-tests.html](http://localhost:3000/fulcro-spec-client-tests.html)
+[http://localhost:2345/fulcro-spec-client-tests.html](http://localhost:2345/fulcro-spec-client-tests.html)
+
+If the server is running you can use port 3000 as well. The 2345 port is figwheel, and it can serve the tests since
+no application server is technically needed.
 
 ## Internationalization
 
