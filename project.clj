@@ -18,7 +18,7 @@
                  [commons-codec "1.10"]
                  [com.taoensso/timbre "4.10.0"]
                  [com.stuartsierra/component "0.3.2"]
-                 [fulcrologic/fulcro-spec "1.0.0-beta2" :scope "test"]]
+                 [fulcrologic/fulcro-spec "1.0.0-beta3-SNAPSHOT" :scope "test"]]
 
   :plugins [[lein-cljsbuild "1.1.6"]
             [lein-doo "0.1.7" :exclusions [org.clojure/tools.reader]]]

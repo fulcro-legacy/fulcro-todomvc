@@ -1,6 +1,6 @@
 (ns fulcro-todomvc.todo-spec
   (:require
-    fulcro-todomvc.api
+    [fulcro-todomvc.api :as api]
     [fulcro.client.mutations :as m]
     [fulcro-spec.core :refer [specification behavior assertions when-mocking]]
     [fulcro.client.util :refer [unique-key]]
@@ -8,7 +8,7 @@
 
 (specification "Adding a todo."
   (let [state (atom {})]
-    ((:action (m/mutate {:state state} 'todo/new-item {:id :new-id :text "Hello"})))
+    ((:action (m/mutate {:state state} `api/todo-new-item {:id :new-id :text "Hello"})))
 
     (assertions
       "Adds an ident to list of todos."
@@ -23,13 +23,13 @@
                                :todo/by-id {1 {:db/id 1 :text "Hello" :item/complete true}}})]
 
     (behavior "when marking complete"
-      ((:action (m/mutate {:state to-complete-state} 'todo/check {:id 1})))
+      ((:action (m/mutate {:state to-complete-state} `api/todo-check {:id 1})))
       (assertions
         "marks todo as completed."
         (get-in @to-complete-state [:todo/by-id 1 :item/complete]) => true))
 
     (behavior "when marking incomplete"
-      ((:action (m/mutate {:state to-active-state} 'todo/uncheck {:id 1})))
+      ((:action (m/mutate {:state to-active-state} `api/todo-uncheck {:id 1})))
       (assertions
         "marks todo as active."
         (get-in @to-active-state [:todo/by-id 1 :item/complete]) => false))))
@@ -38,7 +38,7 @@
   (let [state (atom {:todos      {:list/items [[:todo/by-id 1]]}
                      :todo/by-id {1 {:db/id 1 :item/label "Hello"}}})]
 
-    ((:action (m/mutate {:state state} 'todo/edit {:id 1 :text "Goodbye"})))
+    ((:action (m/mutate {:state state} `api/todo-edit {:id 1 :text "Goodbye"})))
     (assertions
       "changes the text for that todo in the app state."
       (get-in @state [:todo/by-id 1 :item/label]) => "Goodbye")))
@@ -53,7 +53,7 @@
                                             2 {:id 2 :text "Bye" :completed true}}})]
 
     (behavior "when setting all to complete status"
-      ((:action (m/mutate {:state to-complete-state} 'todo/check-all {})))
+      ((:action (m/mutate {:state to-complete-state} `api/todo-check-all {})))
 
       (assertions
         "marks all todo items as complete."
@@ -64,7 +64,7 @@
               (fn [acc todo] (and acc (:item/complete todo))) true todos)))))
 
     (behavior "when un-checking all"
-      ((:action (m/mutate {:state to-active-state} 'todo/uncheck-all {})))
+      ((:action (m/mutate {:state to-active-state} `api/todo-uncheck-all {})))
 
       (assertions
         "marks all todo items as unchecked (active)."
@@ -80,14 +80,14 @@
                      :todo/by-id {1 {:db/id 1 :item/label "Hello"}
                                   2 {:db/id 2 :item/label "Bye" :item/complete true}}})]
 
-    ((:action (m/mutate {:state state} 'todo/clear-complete {})))
+    ((:action (m/mutate {:state state} `api/todo-clear-complete {})))
     (assertions
       "removes completed todos from app state."
       (-> @state :todos :list/items) => [[:todo/by-id 1]])))
 
 (specification "Can change the filter"
   (let [state (atom {})]
-    ((:action (m/mutate {:state state} 'todo/filter {:filter :my-filter})))
+    ((:action (m/mutate {:state state} `api/todo-filter {:filter :my-filter})))
     (assertions
       (-> @state :todos :list/filter) => :my-filter)))
 
@@ -96,7 +96,7 @@
                      :todo/by-id {1 {:id 1 :text "Hello"}
                                   2 {:id 2 :text "Bye" :completed true}}})]
 
-    ((:action (m/mutate {:state state} 'todo/delete-item {:id 1})))
+    ((:action (m/mutate {:state state} `api/todo-delete-item {:id 1})))
     (assertions
       "deletes todo from app state."
       (-> @state :todos :list/items) => [[:todo/by-id 2]]
