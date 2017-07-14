@@ -24,7 +24,7 @@ You can edit `resources/config/dev.edn`, which contains:
  :port 3000} 
 ```
 
-You can configure the datomic database URL to a file-based one if you 
+You can configure the Datomic database URL to a file-based one if you
 wish, in which case you might want to turn off `auto-drop` so
 your lists persist over server restarts. Leave
 `auto-migrate` on, since that just makes sure the schema is up-to-date.
