@@ -5,9 +5,9 @@
             :url  "https://opensource.org/licenses/MIT"}
 
   :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
-                 [org.clojure/clojurescript "1.9.671"]
+                 [org.clojure/clojurescript "1.9.814"]
                  [org.omcljs/om "1.0.0-beta1"]
-                 [fulcrologic/fulcro "1.0.0-beta3"]
+                 [fulcrologic/fulcro "1.0.0-beta5-SNAPSHOT"]
                  [fulcrologic/fulcro-datomic "1.0.0-SNAPSHOT" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5561" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
@@ -38,11 +38,14 @@
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["dev/client" "src/main"]
                         :figwheel     true
-                        :compiler     {:main                 cljs.user
+                        :compiler     {;:main                 cljs.user
                                        :asset-path           "js/compiled/dev"
-                                       :output-to            "resources/public/js/compiled/fulcro-todomvc.js"
                                        :output-dir           "resources/public/js/compiled/dev"
                                        :recompile-dependents true
+                                       :modules              {:main                           {:entries   #{"cljs.user"}
+                                                                                               :output-to "resources/public/js/compiled/fulcro-todomvc.js"}
+                                                              :fulcro.i18n.translations/es-MX {:entries   #{"fulcro-todomvc.i18n.es-MX"}
+                                                                                               :output-to "resources/public/js/compiled/es-MX.js"}}
                                        :preloads             [devtools.preload]
                                        :optimizations        :none}}
                        {:id           "i18n"
@@ -77,21 +80,22 @@
                                        :preloads             [devtools.preload]
                                        :recompile-dependents true
                                        :optimizations        :none}}
-
                        {:id           "production"
                         :source-paths ["src/main"]
-                        :compiler     {:verbose         true
-                                       :main            fulcro-todomvc.client-main-production
-                                       :output-to       "resources/public/js/compiled/fulcro-todomvc.min.js"
-                                       :output-dir      "resources/public/js/compiled"
-                                       :pretty-print    false
-                                       :closure-defines {goog.DEBUG false}
-                                       :source-map      "resources/public/js/compiled/fulcro-todomvc.min.js.map"
-                                       :elide-asserts   true
-                                       :optimizations   :advanced}}]}
+                        :compiler     {;:main          fulcro-todomvc.client-main-production
+                                       :asset-path    "js/production"
+                                       :verbose       true
+                                       ;:output-to     "resources/public/js/fulcro-todomvc.min.js"
+                                       :output-dir    "resources/public/js/production"
+                                       :modules       {:main                           {:output-to "resources/public/js/production/fulcro-todomvc.min.js"
+                                                                                        :entries   #{"fulcro-todomvc.client-main-production"}}
+                                                       :fulcro.i18n.translations/es-MX {:output-to "resources/public/js/production/es-MX.js"
+                                                                                        :entries   #{"fulcro-todomvc.i18n.es-MX"}}}
+                                       :optimizations :simple}}]}
 
-  :figwheel {:css-dirs    ["resources/public/css"]
-             :server-port 2345}
+  :figwheel {:css-dirs        ["resources/public/css"]
+             :validate-config false
+             :server-port     2345}
 
   :profiles {
              :dev {

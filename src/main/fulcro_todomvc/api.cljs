@@ -1,6 +1,7 @@
 (ns fulcro-todomvc.api
   (:require [fulcro.client.mutations :as m :refer [defmutation]]
             [fulcro.client.util :refer [unique-key]]
+            [cljs.loader :as loader]
             [fulcro.support-viewer :as v]))
 
 (defmutation toggle-support [ignored]
@@ -55,3 +56,8 @@
 (defmutation todo-filter [{:keys [filter]}]
   (action [{:keys [state]}]
     (swap! state assoc-in [:todos :list/filter] filter)))
+
+(defmutation trigger-locale-load [params]
+  (action [env]
+    (loader/load :fulcro.i18n.translations/es-MX
+      (fn [] ((resolve 'fulcro-todomvc.i18n.es-MX/loading-complete))))))

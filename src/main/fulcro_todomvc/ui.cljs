@@ -182,7 +182,7 @@
         (dom/div #js {:className "locale-selector"}
           (dom/select #js {:value    locale
                            :onChange (fn [evt]
-                                       (om/transact! this `[(mut/change-locale {:lang ~(.. evt -target -value)})]))}
+                                       (om/transact! this `[(m/trigger-locale-load {}) (mut/change-locale {:lang ~(.. evt -target -value)})]))}
             (dom/option #js {:value "en-US"} "English")
             (dom/option #js {:value "es-MX"} "Español")))
         (dom/div #js {:className "support-request"}
