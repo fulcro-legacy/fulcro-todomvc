@@ -159,9 +159,6 @@
   (footer-info [this]
     (dom/footer #js {:className "info"}
       (dom/p nil (tr "Double-click to edit a todo"))
-      (dom/p nil (tr "Created by ")
-        (dom/a #js {:href   "http://www.thenavisway.com"
-                    :target "_blank"} "NAVIS"))
       (dom/p nil "Part of "
         (dom/a #js {:href   "http://todomvc.com"
                     :target "_blank"} "TodoMVC")))))
@@ -172,7 +169,7 @@
   static uc/InitialAppState
   (initial-state [c p] {:todos (uc/get-initial-state TodoList {})})
   static om/IQuery
-  (query [this] `[:ui/support-visible :ui/react-key :ui/locale {:todos ~(om/get-query TodoList)}])
+  (query [this] [:ui/support-visible :ui/react-key :ui/locale {:todos (om/get-query TodoList)}])
   Object
   (initLocalState [this] {:comment ""})
   (render [this]
