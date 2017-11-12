@@ -1,5 +1,5 @@
 (ns fulcro-todomvc.api
-  (:require [om.next.server :as om]
+  (:require [fulcro.server :as om]
             [datomic.api :as d]
             [fulcro.datomic.protocols :as db]
             [fulcro.server :refer [defmutation defquery-root]]

@@ -3,8 +3,8 @@
     [fulcro-todomvc.api :as api]
     [fulcro.client.mutations :as m]
     [fulcro-spec.core :refer [specification behavior assertions when-mocking]]
-    [fulcro.client.util :refer [unique-key]]
-    [om.next :as om]))
+    [fulcro.util :refer [unique-key]]
+    [fulcro.client.primitives :as om]))
 
 (specification "Adding a todo."
   (let [state (atom {})]

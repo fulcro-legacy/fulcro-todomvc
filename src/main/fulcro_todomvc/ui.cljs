@@ -1,10 +1,10 @@
 (ns fulcro-todomvc.ui
-  (:require [om.next :as om :refer [defui]]
+  (:require [fulcro.client.primitives :as om :refer [defui]]
             [fulcro.client.mutations :as mut]
             [fulcro-todomvc.api :as m]
             [fulcro.i18n :refer [tr trf]]
             yahoo.intl-messageformat-with-locales
-            [om.dom :as dom]
+            [fulcro.client.dom :as dom]
             [fulcro.client.core :as uc]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))

@@ -6,7 +6,7 @@
             [goog.history.EventType :as EventType]
             [fulcro-todomvc.api :as m]                      ; ensures mutations are loaded
             [fulcro.client.mutations :refer [defmutation mutate]]
-            [om.next :as om]
+            [fulcro.client.primitives :as om]
             fulcro-todomvc.i18n.locales                     ; make sure i18n resources are loaded
             fulcro-todomvc.i18n.default-locale
             [fulcro.client.data-fetch :as df])
