@@ -10,14 +10,13 @@
 
 ; One way to make a mutation with an explicity FQ symbol. The return value of this function must a map
 ; with a lambda at the `:action` key.
-(defmethod fulcro.server/server-mutate 'support/send-request [e k p]
-  {:action
-   (fn []
-     (let [_  (swap! last-id inc)
-           id @last-id]
-       (timbre/info "New support request " id)
-       (swap! requests assoc id p)
-       id))})
+(defmutation fulcro.client.mutations/send-history [p]
+  (action [env]
+    (let [_  (swap! last-id inc)
+          id @last-id]
+      (timbre/info "New support request " id)
+      (swap! requests assoc id p)
+      id)))
 
 (defn resolve-ids [new-db omids->tempids tempids->realids]
   (reduce

@@ -42,14 +42,14 @@
 
 (set-level! :info)
 
-(defn init
+(defn- init
   "Create a web server from configurations. Use `start` to start it."
   []
   (reset! system (server/make-system)))
 
-(defn start "Start (an already initialized) web server." [] (swap! system component/start))
+(defn- start "Start (an already initialized) web server." [] (swap! system component/start))
 
-(defn stop "Stop the running web server. Is a no-op if the server is already stopped" []
+(defn- stop "Stop the running web server. Is a no-op if the server is already stopped" []
   (when @system
     (swap! system component/stop)
     (reset! system nil)))
@@ -58,7 +58,7 @@
   (init)
   (start))
 
-(defn reset
+(defn restart
   "Stop the web server, refresh all namespace source code from disk, then restart the web server."
   []
   (stop)

@@ -76,7 +76,7 @@ If you make changes to the source code hot code reload will re-render without a 
 Changes to server code can be put into effect at the REPL (NOTE: will wipe database) with:
 
 ```
-(reset)
+(restart)
 ```
 
 ## Running the tests

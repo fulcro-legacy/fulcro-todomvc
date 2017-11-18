@@ -13,6 +13,7 @@
                  [joda-time "2.9.9"]
                  [clj-time "0.13.0"]
                  [lein-doo "0.1.7" :scope "test" :exclusions [org.clojure/tools.reader]]
+                 [fipp "0.6.12"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
                  [commons-codec "1.10"]
                  [com.taoensso/timbre "4.10.0"]
