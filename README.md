@@ -122,7 +122,13 @@ support viewer with this URL (embedding the correct ID from the server log):
 
 You should now be able to step back in time through up to 100 steps of history. Each support request 
 is stored separately. The implementation on this server does not persist them
-to Datomic, so they only exist for the lifetime of the server. 
+to Datomic, so they only exist for the lifetime of the server.
+
+## Fulcro Inspect Integration
+
+While in dev mode you should be able to press CTRL-F to pop open inspection tools. These
+let you view the network interactions from a Fulcro perspective, browse the app
+database, and other things.
 
 ## Credit
 
