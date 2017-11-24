@@ -4,10 +4,10 @@
   :license {:name "MIT"
             :url  "https://opensource.org/licenses/MIT"}
 
-  :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
-                 [org.clojure/clojurescript "1.9.671"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.9.946"]
                  [org.omcljs/om "1.0.0-beta1"]
-                 [fulcrologic/fulcro "1.0.0-beta3"]
+                 [fulcrologic/fulcro "1.2.0"]
                  [fulcrologic/fulcro-datomic "1.0.0-SNAPSHOT" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5561" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
@@ -18,10 +18,10 @@
                  [commons-codec "1.10"]
                  [com.taoensso/timbre "4.10.0"]
                  [com.stuartsierra/component "0.3.2"]
-                 [fulcrologic/fulcro-spec "1.0.0-beta3-SNAPSHOT" :scope "test"]]
+                 [fulcrologic/fulcro-spec "1.0.0" :scope "test"]]
 
-  :plugins [[lein-cljsbuild "1.1.6"]
-            [lein-doo "0.1.7" :exclusions [org.clojure/tools.reader]]]
+  :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-doo "0.1.8" :exclusions [org.clojure/tools.reader]]]
 
   :doo {:build "automated-tests"
         :paths {:karma "node_modules/karma/bin/karma"}}
@@ -43,7 +43,7 @@
                                        :output-to            "resources/public/js/compiled/fulcro-todomvc.js"
                                        :output-dir           "resources/public/js/compiled/dev"
                                        :recompile-dependents true
-                                       :preloads             [devtools.preload]
+                                       :preloads             [devtools.preload fulcro.inspect.preload]
                                        :optimizations        :none}}
                        {:id           "i18n"
                         :source-paths ["src/main"]
@@ -96,13 +96,12 @@
   :profiles {
              :dev {
                    :source-paths ["src/main" "dev/client" "dev/server"]
-                   :repl-options {
-                                  :init-ns          user
+                   :repl-options {:init-ns          user
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]
-                                  :port             7001
-                                  }
+                                  :port             7001}
                    :env          {:dev true}
-                   :dependencies [[figwheel-sidecar "0.5.11" :exclusions [ring/ring-core]]
-                                  [binaryage/devtools "0.9.4" :exclusions [environ]]
+                   :dependencies [[figwheel-sidecar "0.5.14" :exclusions [ring/ring-core]]
+                                  [fulcrologic/fulcro-inspect "0.1.0-SNAPSHOT"]
+                                  [binaryage/devtools "0.9.7" :exclusions [environ]]
                                   [com.cemerick/piggieback "0.2.2"]
                                   [org.clojure/tools.nrepl "0.2.13"]]}})
