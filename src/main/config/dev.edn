@@ -1,0 +1,5 @@
+{:datomic {:dbs {:todo {:url          "datomic:mem://todo"
+                        :schema       "fulcro-todomvc.migrations"
+                        :auto-migrate true
+                        :auto-drop    true}}}
+ :port    3000}

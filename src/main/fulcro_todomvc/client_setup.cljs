@@ -1,32 +1,31 @@
 (ns fulcro-todomvc.client-setup
-  (:require [fulcro.client.core :as uc]
+  (:require [fulcro.client :as fc]
             [fulcro-todomvc.ui :as ui]
             [goog.events :as events]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.history.EventType :as EventType]
             [fulcro-todomvc.api :as m]                      ; ensures mutations are loaded
             [fulcro.client.mutations :refer [defmutation mutate]]
-            [om.next :as om]
+            [fulcro.client.primitives :as prim]
             fulcro-todomvc.i18n.locales                     ; make sure i18n resources are loaded
             fulcro-todomvc.i18n.default-locale
             [fulcro.client.data-fetch :as df])
   (:import goog.History))
 
-(defn delayed-transact! [r tx]
-  (js/setTimeout #(om/transact! r tx) 10))
-
+;; On page load these will get triggered, but the list won't be loaded yet. So, see the code for todo-filter and
+;; set-desired-filter (post mutation on the load)
 (defn configure-routing! [reconciler]
   (secretary/set-config! :prefix "#")
 
   ; Secretary could fire an event *while* we're in setup, so we delay txes
   (defroute active-items "/active" []
-    (delayed-transact! (om/app-root reconciler) `[(m/todo-filter {:filter :list.filter/active})]))
+    (prim/transact! reconciler `[(m/todo-filter {:filter :list.filter/active})]))
 
   (defroute completed-items "/completed" []
-    (delayed-transact! (om/app-root reconciler) `[(m/todo-filter {:filter :list.filter/completed})]))
+    (prim/transact! reconciler `[(m/todo-filter {:filter :list.filter/completed})]))
 
   (defroute all-items "*" []
-    (delayed-transact! (om/app-root reconciler) `[(m/todo-filter {:filter :list.filter/none})])))
+    (prim/transact! reconciler `[(m/todo-filter {:filter :list.filter/none})])))
 
 (defn get-url
   [] (-> js/window .-location .-href))
@@ -44,20 +43,29 @@
   ([url param-name]
    (get (uri-params url) param-name)))
 
-(defn on-app-started [app]
+(defn on-app-started
+  "Stuff we do on initial load. Given to new-fulcro-client."
+  [app]
   (let [reconciler (:reconciler app)
-        state      (om/app-state reconciler)
-        list       (or (get-url-param "list") "main")]
+        state      (prim/app-state reconciler)
+        list       (or (get-url-param "list") "My List")] ; the list name is in the URI, or defaults to "My List"
     (swap! state assoc :list list)
-    (df/load app :todos ui/TodoList {:without #{:list/filter} :params {:list list}})
+    ; load the list (which will auto-create it on the server). The post mutation
+    ; ensures that HTML5 routing gets applied. (that event will have completed before the list is loaded, so the filtering
+    ; would get lost).
+    (df/load app :todos ui/TodoList {:without       #{:list/filter} :params {:list list}
+                                     :post-mutation `m/set-desired-filter})
     (configure-routing! reconciler))
+  ; Start up the HTML5 history events, and dispatch them through secretary. See routes at top of this file.
   (let [h (History.)]
     (events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (doto h (.setEnabled true))))
 
-(defonce app (atom (uc/new-fulcro-client
+; the defonce is so we get hot code reload
+(defonce app (atom (fc/new-fulcro-client
                      :started-callback on-app-started)))
 
 ; support viewer mutation needs to be here, so app history can be resolved without a circular reference
-(defmethod mutate 'support/send-request [{:keys [ast state]} _ {:keys [comment]}]
-  {:remote (assoc ast :params {:comment comment :history (uc/history @app)})})
+(defmutation support/send-request [{:keys [comment]}]
+  (remote [{:keys [ast state]}]
+    (assoc ast :params {:comment comment :history (fc/history @app)})))

@@ -1,5 +1,5 @@
 (ns fulcro-todomvc.support-viewer
-  (:require [fulcro.client.core :as core]
+  (:require [fulcro.client :as core]
             [fulcro.support-viewer :as viewer]
             [fulcro-todomvc.ui :as ui]))
 

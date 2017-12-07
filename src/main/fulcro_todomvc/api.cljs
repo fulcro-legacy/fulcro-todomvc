@@ -1,57 +1,115 @@
 (ns fulcro-todomvc.api
   (:require [fulcro.client.mutations :as m :refer [defmutation]]
-            [fulcro.client.util :refer [unique-key]]
-            [fulcro.support-viewer :as v]))
+            [fulcro.util :refer [unique-key]]
+            [fulcro.support-viewer :as v]
+            [fipp.edn :refer [pprint]]
+            [fulcro.client.primitives :as prim]
+            [fulcro.client.logging :as log]))
 
-(defmutation toggle-support [ignored]
-  (action [{:keys [state]}] (swap! state update :ui/support-visible not)))
+(defn add-item-to-list*
+  "Add an item's ident onto the end of the given list."
+  [state-map list-id item-id]
+  (update-in state-map [:list/by-id list-id :list/items] (fnil conj []) [:todo/by-id item-id]))
 
-(defmutation todo-new-item [{:keys [id text]}]
+(defn create-item*
+  "Create a new todo item and insert it into the todo item table."
+  [state-map id text]
+  (assoc-in state-map [:todo/by-id id] {:db/id id :item/label text}))
+
+(defn set-item-checked*
+  [state-map id checked?]
+  (assoc-in state-map [:todo/by-id id :item/complete] checked?))
+
+(defn clear-list-input-field*
+  "Clear the main input field of the todo list"
+  [state-map id]
+  (assoc-in state-map [:list/by-id id :ui/new-item-text] ""))
+
+(defmutation ^:intern todo-new-item [{:keys [list-id id text]}]
   (action [{:keys [state ast]}]
     (swap! state #(-> %
-                    (update-in [:todos :list/items] (fn [todos] ((fnil conj []) todos [:todo/by-id id])))
-                    (assoc-in [:todo/by-id id] {:db/id id :item/label text}))))
-  (remote [{:keys [state ast]}] (assoc ast :params {:id id :text text :list (:list @state)})))
-
-(defmutation todo-check [{:keys [id]}]
-  (action [{:keys [state]}] (swap! state assoc-in [:todo/by-id id :item/complete] true))
+                    (create-item* id text)
+                    (add-item-to-list* list-id id)
+                    (clear-list-input-field* list-id))))
   (remote [env] true))
 
-(defmutation todo-uncheck [{:keys [id]}]
-  (action [{:keys [state]}] (swap! state assoc-in [:todo/by-id id :item/complete] false))
-  (remote [env] true))
-
-(defmutation todo-edit [{:keys [id text]}]
-  (action [{:keys [state]}] (swap! state assoc-in [:todo/by-id id :item/label] text))
-  (remote [env] true))
-
-(defmutation todo-delete-item [{:keys [id]}]
+(defmutation ^:intern todo-check [{:keys [id]}]
   (action [{:keys [state]}]
-    (letfn [(remove-item [todos] (vec (remove #(= id (second %)) todos)))]
-      (swap! state #(-> %
-                      (update-in [:todos :list/items] remove-item)
-                      (update :todo/by-id dissoc id)))))
+    (swap! state set-item-checked* id true))
   (remote [env] true))
 
-(defn- set-completed [val todos]
-  (into {} (map (fn [[k v]] [k (assoc v :item/complete val)]) todos)))
-
-(defmutation todo-check-all [ignored]
-  (action [{:keys [state]}] (swap! state update :todo/by-id (partial set-completed true)))
-  (remote [{:keys [ast state]}] (assoc ast :params {:id (:list @state)})))
-
-(defmutation todo-uncheck-all [ignored]
-  (action [{:keys [state]}] (swap! state update :todo/by-id (partial set-completed false)))
-  (remote [{:keys [ast state]}] (assoc ast :params {:id (:list @state)})))
-
-(defmutation todo-clear-complete [_]
+(defmutation ^:intern todo-uncheck [{:keys [id]}]
   (action [{:keys [state]}]
-    (swap! state (fn [st]
-                   (-> st
-                     (update-in [:todos :list/items]
-                       (fn [todos] (vec (remove (fn [[_ id]] (get-in @state [:todo/by-id id :item/complete] false)) todos))))))))
-  (remote [{:keys [ast state]}] (assoc ast :params {:id (:list @state)})))
+    (swap! state set-item-checked* id false))
+  (remote [env] true))
 
-(defmutation todo-filter [{:keys [filter]}]
+(defn set-item-label*
+  "Set the given item's label"
+  [state-map id text]
+  (assoc-in state-map [:todo/by-id id :item/label] text))
+
+(defmutation ^:intern commit-label-change
+  "Mutation: Commit the given text as the new label for the item with id."
+  [{:keys [id text]}]
   (action [{:keys [state]}]
-    (swap! state assoc-in [:todos :list/filter] filter)))
+    (swap! state set-item-label* id text))
+  (remote [env] true))
+
+(defn remove-from-idents
+  "Given a vector of idents and an id, return a vector of idents that have none that use that ID for their second (id) element."
+  [vec-of-idents id]
+  (vec (filter (fn [ident] (not= id (second ident))) vec-of-idents)))
+
+(defmutation ^:intern todo-delete-item [{:keys [list-id id]}]
+  (action [{:keys [state]}]
+    (swap! state #(-> %
+                    (update-in [:list/by-id list-id :list/items] remove-from-idents id)
+                    (update :todo/by-id dissoc id))))
+  (remote [env] true))
+
+(defn on-all-items-in-list
+  "Run the xform on all of the todo items in the list with list-id. The xform will be called with the state map and the
+  todo's id and must return a new state map with that todo updated. The args will be applied to the xform as additional
+  arguments"
+  [state-map list-id xform & args]
+  (let [item-idents (get-in state-map [:list/by-id list-id :list/items])]
+    (reduce (fn [s idt]
+              (let [id (second idt)]
+                (apply xform s id args))) state-map item-idents)))
+
+(defmutation ^:intern todo-check-all [{:keys [list-id]}]
+  (action [{:keys [state]}]
+    (swap! state on-all-items-in-list list-id set-item-checked* true))
+  (remote [env] true))
+
+(defmutation ^:intern todo-uncheck-all [{:keys [list-id]}]
+  (action [{:keys [state]}]
+    (swap! state on-all-items-in-list list-id set-item-checked* false))
+  (remote [{:keys [ast state]}] true))
+
+(defmutation ^:intern todo-clear-complete [{:keys [list-id]}]
+  (action [{:keys [state]}]
+    (let [is-complete? (fn [item-ident] (get-in @state (conj item-ident :item/complete)))]
+      (swap! state update-in [:list/by-id list-id :list/items]
+        (fn [todos] (vec (remove (fn [ident] (is-complete? ident)) todos))))))
+  (remote [env] true))
+
+(defmutation ^:intern set-desired-filter
+  "Check to see if there was a desired filter. If so, put it on the now-active list and remove the desire."
+  [ignored]
+  (action [{:keys [state]}]
+    (let [list-id        (get-in @state [:todos 1])
+          desired-filter (get @state :root/desired-filter)]
+      (when (and list-id desired-filter)
+        (swap! state assoc-in [:list/by-id list-id :list/filter] desired-filter)
+        (swap! state dissoc :root/desired-filter)))))
+
+(defmutation ^:intern todo-filter
+  "Change the filter on the active list (the one pointed to by top-level :todos). If there isn't one, stash
+  it in :root/desired-filter."
+  [{:keys [filter]}]
+  (action [{:keys [state]}]
+    (let [list-id (get-in @state [:todos 1])]
+      (if list-id
+        (swap! state assoc-in [:list/by-id list-id :list/filter] filter)
+        (swap! state assoc :root/desired-filter filter)))))
