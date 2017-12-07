@@ -169,7 +169,7 @@
           (dom/button #js {:onClick (fn []
                                       (prim/transact! this `[(mut/send-history {:comment ~comment})])
                                       (mut/toggle! this :ui/support-visible)
-                                      (mut/set-string! this :ui/comment :value "")
-                                      )} (tr "Send Request")))
+                                      (mut/set-string! this :ui/comment :value ""))}
+            (tr "Send Request")))
         (dom/button #js {:onClick #(mut/toggle! this :ui/support-visible)} (tr "Help!"))))
     (ui-todo-list todos)))

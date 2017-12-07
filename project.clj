@@ -27,6 +27,7 @@
                         :source-paths ["src/main"]
                         :jar          true
                         :compiler     {:asset-path    "js/prod"
+                                       :main          fulcro-todomvc.client-main
                                        :optimizations :advanced
                                        :source-map    "resources/public/js/fulcro-todomvc.js.map"
                                        :output-dir    "resources/public/js/prod"
