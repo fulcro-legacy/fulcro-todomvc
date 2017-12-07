@@ -2,6 +2,7 @@
   (:require [datomic.api :as d]
             [fulcro.datomic.schema :as s]))
 
+; Our Datomic Schema. fulcro-datomic includes a fork of datomic-schema.
 (defn transactions []
   [(s/generate-schema
      [(s/schema list
