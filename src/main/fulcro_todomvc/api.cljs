@@ -95,7 +95,8 @@
   (remote [env] true))
 
 (defmutation ^:intern set-desired-filter
-  "Check to see if there was a desired filter. If so, put it on the now-active list and remove the desire."
+  "Check to see if there was a desired filter. If so, put it on the now-active list and remove the desire. This is
+  necessary because the HTML5 routing event comes to us on app load before we can load the list."
   [ignored]
   (action [{:keys [state]}]
     (let [list-id        (get-in @state [:todos 1])

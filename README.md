@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/fulcrologic/fulcro-todomvc.svg?branch=master)](https://travis-ci.org/fulcrologic/fulcro-todomvc)
 
 This is a  full-stack implementation of
-the TodoMVC application. It extends the requirements of the standard TodoMVC to include:
+the TodoMVC application in Fulcro 2.0. It extends the requirements of the standard TodoMVC to include:
 
 - Server-side Persistence: Lists are persisted in an in-memory Datomic instance (you can have more than one list, selected by adding a ?list=X param to URL).
 - Internationalization 
@@ -83,9 +83,9 @@ Changes to server code can be put into effect at the REPL (NOTE: will wipe datab
 
 The figwheel build above will start the client test build. Simply open
 (any number of) browsers on 
-[http://localhost:2345/fulcro-spec-client-tests.html](http://localhost:2345/fulcro-spec-client-tests.html)
+[http://localhost:3449/fulcro-spec-client-tests.html](http://localhost:3449/fulcro-spec-client-tests.html)
 
-If the server is running you can use port 3000 as well. The 2345 port is figwheel, and it can serve the tests since
+If the server is running you can use port 3000 as well. The 3449 port is figwheel, and it can serve the tests since
 no application server is technically needed.
 
 ## Internationalization

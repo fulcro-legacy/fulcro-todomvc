@@ -91,11 +91,34 @@
       "removes completed todos from app state."
       (-> @state :list/by-id :main :list/items) => [[:todo/by-id 1]])))
 
-(specification "Can change the filter"
-  (let [state (atom {})]
-    (api/todo-filter {:state state} {:list-id :main :filter :my-filter})
-    (assertions
-      (-> @state :list/by-id :main :list/filter) => :my-filter)))
+(specification "filtering"
+  (behavior "on startup, caches the desired filter"
+    (let [state (atom {})]
+
+      (api/todo-filter {:state state} {:filter :my-filter})
+
+      (assertions
+        (-> @state :root/desired-filter) => :my-filter)))
+  (behavior "then the set-desired-filter post mutation"
+    (let [state (atom {:todos               [:list/by-id 1]
+                       :root/desired-filter :active
+                       :list/by-id          {1 {:db/id 1}}})]
+
+      (api/set-desired-filter {:state state} {})
+
+      (assertions
+        "copies the desired filter onto the now-loaded list."
+        (get-in @state [:list/by-id 1 :list/filter]) => :active
+        "removes the desire."
+        (-> @state :root/desired-filter) => nil)))
+  (behavior "during normal operation, it uses :todos to find the active list and applies the filter"
+    (let [state (atom {:todos      [:list/by-id 1]
+                       :list/by-id {1 {:db/id 1}}})]
+
+      (api/todo-filter {:state state} {:filter :inactive})
+
+      (assertions
+        (get-in @state [:list/by-id 1 :list/filter]) => :inactive))))
 
 (specification "Delete todo"
   (let [state (atom {:list/by-id {:main {:list/items [[:todo/by-id 1] [:todo/by-id 2]]}}
