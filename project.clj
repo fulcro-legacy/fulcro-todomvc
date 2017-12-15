@@ -1,11 +1,11 @@
-(defproject fulcrologic/todomvc "2.0.0-SNAPSHOT"
+(defproject fulcrologic/todomvc "2.0.0"
   :description "Full-Stack TodoMVC in Fulcro"
   :license {:name "MIT" :url "https://opensource.org/licenses/MIT"}
   :min-lein-version "2.7.0"
 
   :dependencies [[org.clojure/clojure "1.9.0-RC2"]
                  [org.clojure/clojurescript "1.9.946"]
-                 [fulcrologic/fulcro "2.0.0-RC2-SNAPSHOT"]
+                 [fulcrologic/fulcro "2.0.0-RC2"]
                  [fulcrologic/fulcro-datomic "2.0.0-alpha1" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5561" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
@@ -116,6 +116,7 @@
                                          [org.clojure/tools.namespace "0.3.0-alpha4"]
                                          [fulcrologic/fulcro-inspect "2.0.0-alpha2"]
                                          [org.clojure/tools.nrepl "0.2.13"]
+                                         [org.clojure/test.check "0.9.0"]
                                          [com.cemerick/piggieback "0.2.2"]
                                          [lein-doo "0.1.7" :scope "test"]
                                          [figwheel-sidecar "0.5.14" :exclusions [org.clojure/tools.reader]]

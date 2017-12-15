@@ -4,11 +4,16 @@
     [cljs.pprint :refer [pprint]]
     [fulcro.client.logging :as log]
     [fulcro-todomvc.ui :as ui]
+    [clojure.spec.alpha :as s]
+    [clojure.spec.test.alpha :as st]
+    fulcro.history
     [fulcro-todomvc.client-setup :refer [app]]))
 
 (enable-console-print!)
 
 (log/set-level :all)
+
+;(st/instrument)
 
 (defn mount []
   (reset! app (fc/mount @app ui/Root "app")))
