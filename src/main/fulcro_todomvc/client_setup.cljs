@@ -48,13 +48,14 @@
   [app]
   (let [reconciler (:reconciler app)
         state      (prim/app-state reconciler)
-        list       (or (get-url-param "list") "My List")] ; the list name is in the URI, or defaults to "My List"
+        list       (or (get-url-param "list") "My List")]   ; the list name is in the URI, or defaults to "My List"
     (swap! state assoc :list list)
     ; load the list (which will auto-create it on the server). The post mutation
     ; ensures that HTML5 routing gets applied. (that event will have completed before the list is loaded, so the filtering
     ; would get lost).
     (df/load app :todos ui/TodoList {:without       #{:list/filter} :params {:list list}
-                                     :post-mutation `m/set-desired-filter})
+                                     :post-mutation `m/set-desired-filter
+                                     :target        [:application :root :todos]})
     (configure-routing! reconciler))
   ; Start up the HTML5 history events, and dispatch them through secretary. See routes at top of this file.
   (let [h (History.)]
@@ -64,8 +65,3 @@
 ; the defonce is so we get hot code reload
 (defonce app (atom (fc/new-fulcro-client
                      :started-callback on-app-started)))
-
-; support viewer mutation needs to be here, so app history can be resolved without a circular reference
-(defmutation support/send-request [{:keys [comment]}]
-  (remote [{:keys [ast state]}]
-    (assoc ast :params {:comment comment :history (fc/history @app)})))

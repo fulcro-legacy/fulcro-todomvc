@@ -94,12 +94,14 @@
         (fn [todos] (vec (remove (fn [ident] (is-complete? ident)) todos))))))
   (remote [env] true))
 
+(defn current-list-id [state] (get-in state [:application :root :todos 1]))
+
 (defmutation ^:intern set-desired-filter
   "Check to see if there was a desired filter. If so, put it on the now-active list and remove the desire. This is
   necessary because the HTML5 routing event comes to us on app load before we can load the list."
   [ignored]
   (action [{:keys [state]}]
-    (let [list-id        (get-in @state [:todos 1])
+    (let [list-id        (current-list-id @state)
           desired-filter (get @state :root/desired-filter)]
       (when (and list-id desired-filter)
         (swap! state assoc-in [:list/by-id list-id :list/filter] desired-filter)
@@ -110,7 +112,7 @@
   it in :root/desired-filter."
   [{:keys [filter]}]
   (action [{:keys [state]}]
-    (let [list-id (get-in @state [:todos 1])]
+    (let [list-id (current-list-id @state)]
       (if list-id
         (swap! state assoc-in [:list/by-id list-id :list/filter] filter)
         (swap! state assoc :root/desired-filter filter)))))

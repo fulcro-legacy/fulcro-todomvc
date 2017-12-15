@@ -1,6 +1,6 @@
 (ns fulcro-todomvc.ui
   (:require [fulcro.client.primitives :as prim :refer [defsc]]
-            [fulcro.client.mutations :as mut]
+            [fulcro.client.mutations :as mut :refer [defmutation]]
             [fulcro-todomvc.api :as api]
             [fulcro.i18n :refer [tr trf]]
             yahoo.intl-messageformat-with-locales
@@ -148,14 +148,28 @@
 
 (def ui-todo-list (prim/factory TodoList))
 
-(defsc Root [this {:keys [ui/support-visible ui/react-key todos ui/locale ui/comment] :or {ui/react-key "ROOT"}}]
+(defmutation fulcro.client.mutations/send-history
+  "Send the current app history to the server. The params can include anything and will be merged with a `:history` entry.
+  Your server implementation of `fulcro.client.mutations/send-history` should record the data of history for
+  retrieval by a root query for :support-request, which should at least include the stored :history and optionally a
+  :comment from the user. You should add whatever identity makes sense for tracking."
+  [params]
+  (remote [{:keys [reconciler state ast]}]
+    (let [history (-> reconciler (prim/get-history) deref)
+          params  (assoc params :history history)]
+      (js/console.log :h (:fulcro.history/history-steps history)
+        :c (count (:fulcro.history/history-steps history)))
+      (assoc ast :params params))))
+
+(defsc Application [this {:keys [ui/support-visible ui/react-key todos ui/locale ui/comment] :or {ui/react-key "ROOT"}}]
   {:initial-state (fn [p] {:todos              (prim/get-initial-state TodoList {})
                            :ui/support-visible false
                            :ui/comment         ""})
-   :query         [:ui/support-visible :ui/comment :ui/react-key :ui/locale {:todos (prim/get-query TodoList)}]}
+   :ident         (fn [] [:application :root])
+   :query         [:ui/support-visible :ui/comment :ui/react-key [:ui/locale '_] {:todos (prim/get-query TodoList)}]}
   (dom/div #js {:key (or react-key "ROOT")}
     (dom/div #js {:className "locale-selector"}
-      (dom/select #js {:value    locale
+      (dom/select #js {:value    (or locale "")
                        :onChange (fn [evt]
                                    (prim/transact! this `[(mut/change-locale {:lang ~(.. evt -target -value)})]))}
         (dom/option #js {:value "en-US"} "English")
@@ -167,9 +181,18 @@
                              :onChange (fn [evt] (mut/set-string! this :ui/comment :event evt))})
           (dom/br nil)
           (dom/button #js {:onClick (fn []
-                                      (prim/transact! this `[(mut/send-history {:comment ~comment})])
+                                      (prim/transact! this `[(fulcro.client.mutations/send-history {:comment ~comment})])
                                       (mut/toggle! this :ui/support-visible)
                                       (mut/set-string! this :ui/comment :value ""))}
             (tr "Send Request")))
         (dom/button #js {:onClick #(mut/toggle! this :ui/support-visible)} (tr "Help!"))))
     (ui-todo-list todos)))
+
+(def ui-application (prim/factory Application))
+
+(defsc Root [this {:keys [ui/react-key root/application]}]
+  {:initial-state (fn [p] {:ui/locale        "en-US"
+                           :root/application (prim/get-initial-state Application {})})
+   :query         [:ui/react-key {:root/application (prim/get-query Application)}]}
+  (dom/div #js {:key react-key}
+    (ui-application application)))
