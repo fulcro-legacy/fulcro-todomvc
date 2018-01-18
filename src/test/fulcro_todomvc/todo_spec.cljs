@@ -100,7 +100,7 @@
       (assertions
         (-> @state :root/desired-filter) => :my-filter)))
   (behavior "then the set-desired-filter post mutation"
-    (let [state (atom {:todos               [:list/by-id 1]
+    (let [state (atom {:application         {:root {:todos [:list/by-id 1]}}
                        :root/desired-filter :active
                        :list/by-id          {1 {:db/id 1}}})]
 
@@ -112,8 +112,8 @@
         "removes the desire."
         (-> @state :root/desired-filter) => nil)))
   (behavior "during normal operation, it uses :todos to find the active list and applies the filter"
-    (let [state (atom {:todos      [:list/by-id 1]
-                       :list/by-id {1 {:db/id 1}}})]
+    (let [state (atom {:application {:root {:todos [:list/by-id 1]}}
+                       :list/by-id  {1 {:db/id 1}}})]
 
       (api/todo-filter {:state state} {:filter :inactive})
 

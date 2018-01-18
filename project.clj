@@ -3,7 +3,7 @@
   :license {:name "MIT" :url "https://opensource.org/licenses/MIT"}
   :min-lein-version "2.7.0"
 
-  :dependencies [[org.clojure/clojure "1.9.0-RC2"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.9.946"]
                  [fulcrologic/fulcro "2.1.2"]
                  [fulcrologic/fulcro-datomic "2.0.0-alpha1" :exclusions [org.clojure/tools.cli]]
