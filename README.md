@@ -66,7 +66,7 @@ At the REPL, start the server:
 (go)
 ```
 
-Navigate to: [http://localhost:3000/dev.html?list=MyList](http://localhost:3000/dev.html?list=MyList)
+Navigate to: [http://localhost:3000/index.html?list=MyList](http://localhost:3000/index.html?list=MyList)
 
 The list URL parameter allows you to select which persisted TODO list on the server
 you want.
