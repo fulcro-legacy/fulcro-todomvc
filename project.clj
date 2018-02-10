@@ -5,14 +5,14 @@
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.9.946"]
-                 [fulcrologic/fulcro "2.1.2"]
+                 [fulcrologic/fulcro "2.2.0-SNAPSHOT"]
                  [fulcrologic/fulcro-datomic "2.0.0-alpha1" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5561" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]
                  [joda-time "2.9.9"]
                  [clj-time "0.13.0"]
                  [fipp "0.6.12"]
-                 [fulcrologic/fulcro-spec "2.0.0-beta3" :scope "test" :exclusions [fulcrologic/fulcro]]]
+                 [fulcrologic/fulcro-spec "2.0.1" :scope "test" :exclusions [fulcrologic/fulcro]]]
 
   :uberjar-name "todomvc.jar"
 

@@ -2,7 +2,6 @@
   (:require
     [com.stuartsierra.component :as component]
     [fulcro.server :as c]
-    [taoensso.timbre :as timbre]
     [fulcro-todomvc.server :refer [make-system]])
   (:gen-class))
 

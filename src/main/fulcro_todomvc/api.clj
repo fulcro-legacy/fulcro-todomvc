@@ -3,7 +3,7 @@
             [datomic.api :as d]
             [fulcro.datomic.protocols :as db]
             [fulcro.server :refer [defmutation defquery-root]]
-            [taoensso.timbre :as timbre]))
+            [fulcro.logging :as log]))
 
 (defonce last-id (atom 1000))
 (defonce requests (atom {}))
@@ -16,7 +16,7 @@
   (action [env]
     (let [_  (swap! last-id inc)
           id @last-id]
-      (timbre/info "New support request " id)
+      (log/info "New support request " id)
       (swap! requests assoc id p)
       id)))
 
@@ -58,7 +58,7 @@
           result             @(d/transact connection tx)
           tempid->realid     (:tempids result)              ; remap the incoming om tempid to the now-real datomic ID
           fulcroids->realids (resolve-ids (d/db connection) fulcroid->tempid tempid->realid)]
-      (timbre/info "Added list item " text " to " list)
+      (log/info "Added list item " text " to " list)
       {:tempids fulcroids->realids})))
 
 (defmutation todo-check [{:keys [id]}]
@@ -66,7 +66,7 @@
     (let [connection (db/get-connection todo-database)
           tx         [[:db/add id :item/complete true]]] ; New datomic fact. The entity at ID is not complete.
       @(d/transact connection tx)
-      (timbre/info "Checked list item " id)
+      (log/info "Checked list item " id)
       true)))
 
 (defmutation todo-uncheck [{:keys [id]}]
@@ -74,7 +74,7 @@
     (let [connection (db/get-connection todo-database)
           tx         [[:db/add id :item/complete false]]]
       @(d/transact connection tx)
-      (timbre/info "Unchecked list item " id)
+      (log/info "Unchecked list item " id)
       true)))
 
 (defmutation commit-label-change [{:keys [id text]}]
@@ -82,7 +82,7 @@
     (let [connection (db/get-connection todo-database)
           tx         [[:db/add id :item/label text]]]
       @(d/transact connection tx)
-      (timbre/info "Updated list item " id " to " text)
+      (log/info "Updated list item " id " to " text)
       true)))
 
 (defn- set-checked
@@ -92,7 +92,7 @@
                    [?list-id :list/items ?e]] (d/db connection) list-id)
         tx  (mapv (fn [id] [:db/add id :item/complete value]) ids)] ; make a tx that updates the complete fact on the all.
     @(d/transact connection tx)
-    (timbre/info "Set all items in " list-id " to " (if value "checked" "unchecked"))
+    (log/info "Set all items in " list-id " to " (if value "checked" "unchecked"))
     true))
 
 (defmutation todo-check-all [{:keys [list-id]}]
@@ -108,7 +108,7 @@
     (let [connection (db/get-connection todo-database)
           tx         [[:db.fn/retractEntity id]]] ; the graph edges (:list/items) self-heal in Datomic.
       @(d/transact connection tx)
-      (timbre/info "Deleted item " id)
+      (log/info "Deleted item " id)
       true)))
 
 (defmutation todo-clear-complete [{:keys [list-id]}]
@@ -120,7 +120,7 @@
                             [?e :item/complete true]] (d/db connection) list-id)
           tx         (mapv (fn [id] [:db.fn/retractEntity id]) ids)] ; make a tx that retracts them all (:list/items edges self-heal)
       @(d/transact connection tx)
-      (timbre/info "Deleted all cleared items in list " list-id)
+      (log/info "Deleted all cleared items in list " list-id)
       true)))
 
 (defn ensure-integer [n]
@@ -137,7 +137,7 @@
 (defquery-root :todos
   "Returns the todo items for the given list."
   (value [{:keys [query todo-database]} {:keys [list]}]
-    (timbre/info "Responding to request for list: " list)
+    (log/info "Responding to request for list: " list)
     (let [connection (db/get-connection todo-database)]
       (read-list connection query list))))
 
@@ -147,7 +147,7 @@
   (value [env {:keys [id]}]
     (let [id      (ensure-integer id)
           history (get @requests id [])]
-      (timbre/info "Request for client history: " id)
+      (log/info "Request for client history: " id)
       (when-not (seq history)
-        (timbre/error "Invalid history ID! Perhaps you used a client tx id instead? Known IDs are: " (pr-str (keys @requests))))
+        (log/error "Invalid history ID! Perhaps you used a client tx id instead? Known IDs are: " (pr-str (keys @requests))))
       history)))
