@@ -5,7 +5,7 @@
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.9.946"]
-                 [fulcrologic/fulcro "2.4.1"]
+                 [fulcrologic/fulcro "2.4.2"]
                  [fulcrologic/fulcro-datomic "2.0.0-alpha1" :exclusions [org.clojure/tools.cli]]
                  [com.datomic/datomic-free "0.9.5561" :exclusions [com.google.guava/guava]]
                  [secretary "1.2.3" :exclusions [com.cemerick/clojurescript.test]]

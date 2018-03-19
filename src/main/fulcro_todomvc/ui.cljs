@@ -4,7 +4,6 @@
             [fulcro-todomvc.api :as api]
             [fulcro.i18n :refer [tr trf]]
             yahoo.intl-messageformat-with-locales
-            [fulcro.client.dom :as old-dom]
             [fulcro.client.alpha.dom :as dom]
             [fulcro.client :as fc]))
 
@@ -169,11 +168,11 @@
    :query         [:ui/support-visible :ui/comment [:ui/locale '_] {:todos (prim/get-query TodoList)}]}
   (dom/div
     (dom/div :.locale-selector
-      (old-dom/select #js {:value    (or locale "")
-                           :onChange (fn [evt]
-                                       (prim/transact! this `[(mut/change-locale {:lang ~(.. evt -target -value)})]))}
-        (old-dom/option #js {:value "en-US"} "English")
-        (old-dom/option #js {:value "es-MX"} "Español")))
+      (dom/select {:value    (or locale "")
+                   :onChange (fn [evt]
+                               (prim/transact! this `[(mut/change-locale {:lang ~(.. evt -target -value)})]))}
+        (dom/option {:value "en-US"} "English")
+        (dom/option {:value "es-MX"} "Español")))
     (dom/div :.support-request
       (if support-visible
         (dom/div
