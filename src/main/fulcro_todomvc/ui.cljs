@@ -4,7 +4,8 @@
             [fulcro-todomvc.api :as api]
             [fulcro.i18n :refer [tr trf]]
             yahoo.intl-messageformat-with-locales
-            [fulcro.client.dom :as dom]
+            [fulcro.client.dom :as old-dom]
+            [fulcro.client.alpha.dom :as dom]
             [fulcro.client :as fc]))
 
 (defn is-enter? [evt] (= 13 (.-keyCode evt)))
@@ -36,78 +37,77 @@
                           (mut/toggle! this :ui/editing))
                         (delete-item id)))]
 
-    (dom/li #js {:className (cond-> ""
-                              complete (str "completed")
-                              editing (str " editing"))}
-      (dom/div #js {:className "view"}
-        (dom/input #js {:className "toggle"
-                        :type      "checkbox"
-                        :checked   (boolean complete)
-                        :onChange  #(if complete (uncheck id) (check id))})
-        (dom/label #js {:onDoubleClick (fn []
-                                         (mut/toggle! this :ui/editing)
-                                         (mut/set-string! this :ui/edit-text :value label))} label)
-        (dom/button #js {:className "destroy"
-                         :onClick   #(delete-item id)}))
-      (dom/input #js {:className "edit"
-                      :ref       "edit_field"
-                      :value     (or edit-text "")
-                      :onChange  #(mut/set-string! this :ui/edit-text :event %)
-                      :onKeyDown #(cond
-                                    (is-enter? %) (submit-edit %)
-                                    (is-escape? %) (do (mut/set-string! this :ui/edit-text :value label)
-                                                       (mut/toggle! this :ui/editing)))
-                      :onBlur    #(when editing (submit-edit %))}))))
+    (dom/li {:className (cond-> ""
+                          complete (str "completed")
+                          editing (str " editing"))}
+      (dom/div :.view
+        (dom/input {:type      "checkbox"
+                    :className "toggle"
+                    :checked   (boolean complete)
+                    :onChange  #(if complete (uncheck id) (check id))})
+        (dom/label {:onDoubleClick (fn []
+                                     (mut/toggle! this :ui/editing)
+                                     (mut/set-string! this :ui/edit-text :value label))} label)
+        (dom/button :.destroy {:onClick #(delete-item id)}))
+      (dom/input {:ref       "edit_field"
+                  :className "edit"
+                  :value     (or edit-text "")
+                  :onChange  #(mut/set-string! this :ui/edit-text :event %)
+                  :onKeyDown #(cond
+                                (is-enter? %) (submit-edit %)
+                                (is-escape? %) (do (mut/set-string! this :ui/edit-text :value label)
+                                                   (mut/toggle! this :ui/editing)))
+                  :onBlur    #(when editing (submit-edit %))}))))
 
 (def ui-todo-item (prim/factory TodoItem {:keyfn :db/id}))
 
 
 (defn header [component title]
   (let [{:keys [db/id ui/new-item-text]} (prim/props component)]
-    (dom/header #js {:className "header"}
-      (dom/h1 nil title)
-      (dom/input #js {:className   "new-todo"
-                      :value       (or new-item-text "")
-                      :onKeyDown   (fn [evt]
-                                     (when (is-enter? evt)
-                                       (when-let [trimmed-text (trim-text (.. evt -target -value))]
-                                         (prim/transact! component `[(api/todo-new-item ~{:list-id id
-                                                                                          :id      (prim/tempid)
-                                                                                          :text    trimmed-text})]))))
-                      :onChange    (fn [evt] (mut/set-string! component :ui/new-item-text :event evt))
-                      :placeholder (tr "What needs to be done?")
-                      :autoFocus   true}))))
+    (dom/header :.header
+      (dom/h1 title)
+      (dom/input {:value       (or new-item-text "")
+                  :className   "new-todo"
+                  :onKeyDown   (fn [evt]
+                                 (when (is-enter? evt)
+                                   (when-let [trimmed-text (trim-text (.. evt -target -value))]
+                                     (prim/transact! component `[(api/todo-new-item ~{:list-id id
+                                                                                      :id      (prim/tempid)
+                                                                                      :text    trimmed-text})]))))
+                  :onChange    (fn [evt] (mut/set-string! component :ui/new-item-text :event evt))
+                  :placeholder (tr "What needs to be done?")
+                  :autoFocus   true}))))
 
 (defn filter-footer [component num-todos num-completed]
   (let [{:keys [db/id list/filter]} (prim/props component)
         num-remaining (- num-todos num-completed)]
 
-    (dom/footer #js {:className "footer"}
-      (dom/span #js {:className "todo-count"}
-        (dom/strong nil (trf "{num,plural,=0 {no items} =1 {1 item} other {# items}} left" :num num-remaining)))
-      (dom/ul #js {:className "filters"}
+    (dom/footer :.footer
+      (dom/span :.todo-count
+        (dom/strong (trf "{num,plural,=0 {no items} =1 {1 item} other {# items}} left" :num num-remaining)))
+      (dom/ul :.filters
+        (dom/li
+          (dom/a {:className (when (or (nil? filter) (= :list.filter/none filter)) "selected")
+                  :href      "#"} (tr "All")))
         (dom/li nil
-          (dom/a #js {:className (when (or (nil? filter) (= :list.filter/none filter)) "selected")
-                      :href      "#"} (tr "All")))
+          (dom/a {:className (when (= :list.filter/active filter) "selected")
+                  :href      "#/active"} (tr "Active")))
         (dom/li nil
-          (dom/a #js {:className (when (= :list.filter/active filter) "selected")
-                      :href      "#/active"} (tr "Active")))
-        (dom/li nil
-          (dom/a #js {:className (when (= :list.filter/completed filter) "selected")
-                      :href      "#/completed"} (tr "Completed"))))
+          (dom/a {:className (when (= :list.filter/completed filter) "selected")
+                  :href      "#/completed"} (tr "Completed"))))
       (when (pos? num-completed)
-        (dom/button #js {:className "clear-completed"
-                         :onClick   #(prim/transact! component `[(api/todo-clear-complete {:list-id ~id})])} (tr "Clear Completed"))))))
+        (dom/button {:className "clear-completed"
+                     :onClick   #(prim/transact! component `[(api/todo-clear-complete {:list-id ~id})])} (tr "Clear Completed"))))))
 
 (defn footer-info []
-  (dom/footer #js {:className "info"}
-    (dom/p nil (tr "Double-click to edit a todo"))
-    (dom/p nil (tr "Created by ")
-      (dom/a #js {:href   "http://www.fulcrologic.com"
-                  :target "_blank"} "Fulcrologic, LLC"))
-    (dom/p nil "Part of "
-      (dom/a #js {:href   "http://todomvc.com"
-                  :target "_blank"} "TodoMVC"))))
+  (dom/footer :.info
+    (dom/p (tr "Double-click to edit a todo"))
+    (dom/p (tr "Created by ")
+      (dom/a {:href   "http://www.fulcrologic.com"
+              :target "_blank"} "Fulcrologic, LLC"))
+    (dom/p "Part of "
+      (dom/a {:href   "http://todomvc.com"
+              :target "_blank"} "TodoMVC"))))
 
 (defsc TodoList [this {:keys [list/items list/filter list/title db/id]}]
   {:initial-state (fn [p] {:db/id (prim/tempid) :ui/new-item-text "" :list/items [] :list/title "main" :list/filter :list.filter/none})
@@ -125,20 +125,20 @@
         check           (fn [item-id] (prim/transact! this `[(api/todo-check ~{:id item-id})]))
         uncheck         (fn [item-id] (prim/transact! this `[(api/todo-uncheck ~{:id item-id})]))]
 
-    (dom/div nil
-      (dom/section #js {:className "todoapp"}
+    (dom/div
+      (dom/section :.todoapp
         (header this title)
         (when (pos? num-todos)
-          (dom/div nil
-            (dom/section #js {:className "main"}
-              (dom/input #js {:className "toggle-all"
-                              :type      "checkbox"
-                              :checked   all-completed?
-                              :onClick   (fn [] (if all-completed?
-                                                  (prim/transact! this `[(api/todo-uncheck-all {:list-id ~id})])
-                                                  (prim/transact! this `[(api/todo-check-all {:list-id ~id})])))})
-              (dom/label #js {:htmlFor "toggle-all"} (tr "Mark all as complete"))
-              (dom/ul #js {:className "todo-list"}
+          (dom/div
+            (dom/section :.main
+              (dom/input {:type      "checkbox"
+                          :className "toggle-all"
+                          :checked   all-completed?
+                          :onClick   (fn [] (if all-completed?
+                                              (prim/transact! this `[(api/todo-uncheck-all {:list-id ~id})])
+                                              (prim/transact! this `[(api/todo-check-all {:list-id ~id})])))})
+              (dom/label {:htmlFor "toggle-all"} (tr "Mark all as complete"))
+              (dom/ul :.todo-list
                 (map #(ui-todo-item (prim/computed %
                                       {:delete-item delete-item
                                        :check       check
@@ -161,38 +161,38 @@
         :c (count (:fulcro.history/history-steps history)))
       (assoc ast :params params))))
 
-(defsc Application [this {:keys [ui/support-visible ui/react-key todos ui/locale ui/comment] :or {ui/react-key "ROOT"}}]
+(defsc Application [this {:keys [ui/support-visible todos ui/locale ui/comment]}]
   {:initial-state (fn [p] {:todos              (prim/get-initial-state TodoList {})
                            :ui/support-visible false
                            :ui/comment         ""})
    :ident         (fn [] [:application :root])
-   :query         [:ui/support-visible :ui/comment :ui/react-key [:ui/locale '_] {:todos (prim/get-query TodoList)}]}
-  (dom/div #js {:key (or react-key "ROOT")}
-    (dom/div #js {:className "locale-selector"}
-      (dom/select #js {:value    (or locale "")
-                       :onChange (fn [evt]
-                                   (prim/transact! this `[(mut/change-locale {:lang ~(.. evt -target -value)})]))}
-        (dom/option #js {:value "en-US"} "English")
-        (dom/option #js {:value "es-MX"} "Español")))
-    (dom/div #js {:className "support-request"}
+   :query         [:ui/support-visible :ui/comment [:ui/locale '_] {:todos (prim/get-query TodoList)}]}
+  (dom/div
+    (dom/div :.locale-selector
+      (old-dom/select #js {:value    (or locale "")
+                           :onChange (fn [evt]
+                                       (prim/transact! this `[(mut/change-locale {:lang ~(.. evt -target -value)})]))}
+        (old-dom/option #js {:value "en-US"} "English")
+        (old-dom/option #js {:value "es-MX"} "Español")))
+    (dom/div :.support-request
       (if support-visible
-        (dom/div #js {}
-          (dom/textarea #js {:value    comment
-                             :onChange (fn [evt] (mut/set-string! this :ui/comment :event evt))})
-          (dom/br nil)
-          (dom/button #js {:onClick (fn []
-                                      (prim/transact! this `[(fulcro.client.mutations/send-history {:comment ~comment})])
-                                      (mut/toggle! this :ui/support-visible)
-                                      (mut/set-string! this :ui/comment :value ""))}
+        (dom/div
+          (dom/textarea {:value    comment
+                         :onChange (fn [evt] (mut/set-string! this :ui/comment :event evt))})
+          (dom/br)
+          (dom/button {:onClick (fn []
+                                  (prim/transact! this `[(fulcro.client.mutations/send-history {:comment ~comment})])
+                                  (mut/toggle! this :ui/support-visible)
+                                  (mut/set-string! this :ui/comment :value ""))}
             (tr "Send Request")))
-        (dom/button #js {:onClick #(mut/toggle! this :ui/support-visible)} (tr "Help!"))))
+        (dom/button {:onClick #(mut/toggle! this :ui/support-visible)} (tr "Help!"))))
     (ui-todo-list todos)))
 
 (def ui-application (prim/factory Application))
 
-(defsc Root [this {:keys [ui/react-key root/application]}]
+(defsc Root [this {:keys [root/application]}]
   {:initial-state (fn [p] {:ui/locale        "en-US"
                            :root/application (prim/get-initial-state Application {})})
-   :query         [:ui/react-key {:root/application (prim/get-query Application)}]}
-  (dom/div #js {:key react-key}
+   :query         [{:root/application (prim/get-query Application)}]}
+  (dom/div
     (ui-application application)))
